@@ -1,7 +1,2 @@
-can = list()
-a = input('Digite o canhao: ')
-dados = a.split(',')
-print(dados)
-b = [dados[0],dados[1]]
-can.append(b)
-print(can)
+can = {'cannons': [[2,4],[1,3]], 'type':  'teste'}
+print(can.cannons)
