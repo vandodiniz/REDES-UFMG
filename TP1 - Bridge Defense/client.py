@@ -41,6 +41,9 @@ def authreq(rio, adress):
         saida = rio.recv(bufferSize, 0)
         resposta = json.loads(saida.decode('utf-8'))
         print(resposta)
+        ESTADO.append(resposta['type'])
+        if 'gameover' in ESTADO:
+                quit()
         return 0
     except:
         print('Erro de transmissão')
@@ -57,10 +60,10 @@ def getcannons():
         resposta = json.loads(saida.decode('utf-8'))
         print(resposta)
         VALID_CANNONS.append(resposta['cannons'])
-        return 0
+        ESTADO.append(resposta['type'])
     except:
         print('Erro de transmissão')
-        return 1
+        getcannons()
 
 def getturn(turn):
     #ENVIO
@@ -76,8 +79,15 @@ def state(rio):
             saida = rio.recv(bufferSize, 0)
             resposta = json.loads(saida.decode('utf-8'))
             print(resposta, flush=True)
+
+            for c in range(0,len(resposta)):
+                BOATS.append(resposta['ships'][c]['id'])
+                
+            ESTADO.append(resposta['type'])
+            
         except:
             print('Erro de transmissão')
+            #state(rio)
 
 def shot(rio, adress, cannon, id):
     entrada = json.dumps({"type": "shot", "auth": SAG, "cannon": cannon, "id": id}).encode('utf-8')
@@ -87,11 +97,11 @@ def shot(rio, adress, cannon, id):
     try:
         saida = rio.recv(bufferSize, 0)
         resposta = json.loads(saida.decode('utf-8'))
-        print(resposta)
-        return 0
+        print(resposta, flush=True)
+        ESTADO.append(resposta['type'])
     except:
         print('Erro de transmissão')
-        return 1
+        shot(rio, adress, cannon, id)
 
             
 def quit():
@@ -101,14 +111,22 @@ def quit():
     rio2.sendto(entrada, RIVER[1])
     rio3.sendto(entrada, RIVER[2])
     rio4.sendto(entrada, RIVER[3])
+    rio1.close()
+    rio2.close()
+    rio3.close()
+    rio4.close()
     print('Jogo finalizado com sucesso!')
-    
+    exit()
+
 #DEFININDO AS ESPECIFICAÇÕES DO SERVIDOR E PEGANDO AS INFORMAÇÕES DO TECLADO
 bufferSize = 4096
 RIVER = [0,0,0,0]
 VALID_PORTS = [52221,52222,52223,52224]
 VALID_SERVER = 'bd20212.dcc023.2advanced.dev'
 VALID_CANNONS = []
+BOATS = []
+ESTADO = []
+RIOS = [1,2,3,4]
 
 rio1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 rio2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -139,6 +157,7 @@ for c in range(0,4):
         rio4.connect(RIVER[3])
         rio4.settimeout(1)
 
+print('INICIANDO O JOGO: ')
 auth.append(authreq(rio1, RIVER[0]))
 while auth[0] == 1:
     auth[0] = (authreq(rio1, RIVER[0]))
@@ -156,14 +175,12 @@ while auth[3] == 1:
     auth[3] = (authreq(rio4, RIVER[3]))
 
 if auth == [0,0,0,0]:
-    error = getcannons()
-    while error == 1:
-        error = getcannons()
-    print(VALID_CANNONS)
+    print('AUTENTICAÇÃO COMPLETA')
+    getcannons()
     turno = 0
 
     while turno<5:
-        
+        print(f'ESTADO: {ESTADO}')
         getturn(turno)
 
         print('\nRIO 1:')
@@ -182,11 +199,17 @@ if auth == [0,0,0,0]:
         for c in range(0,8):
             state(rio4)
 
+        print('NAVIOS DISPONIVEIS:', end=' ')
+        
+        print (BOATS)
         for x in VALID_CANNONS[0]:
-            
-            r = int(input(f'Em qual rio voce quer que o canhão {x} dispare? '))
-            identificador = int(input(f'Digite o ID do navio  que o canhão {x} disparará: '))
+            r = int(input(f'Em qual rio voce quer que o canhão {x} dispare? (1 a 4): '))
+            while r not in RIOS:
+                r = int(input(f'Rio inválido! Digite novamente (1 a 4): '))
 
+            identificador = int(input(f'Digite o ID do navio  que o canhão {x} disparará: '))
+            while identificador not in BOATS:
+                identificador = int(input(f'Barco inexistente! Digite um disponível: {BOATS}: '))
             if r == 1:
                 shot(rio1, RIVER[0], x, identificador)
             if r == 2:
@@ -196,13 +219,9 @@ if auth == [0,0,0,0]:
             if r == 4:
                 shot(rio4, RIVER[3], x, identificador)
         turno += 1
-quit()
+        BOATS.clear()
 
-rio1.close()
-rio2.close()
-rio3.close()
-rio4.close()
-
-#bd20212.dcc023.2advanced.dev 52221 2019057195:12142021:713956ac462e3cc9736660c44697d3b6d91ffbe60ee2911114890582c2435f72+2019056890:12142021:d4ae8849f0d2f8ccf163b12a3fcf45908b61c8f2239f3806fe6292f3428a37ce+3933183216bb827a7cdca38687047dd1a191952b1afb1a01bcfd92ade29ae224
-
-print()
+else:
+    print('FALHA NA AUTENTICAÇÃO')
+    quit()
+    
