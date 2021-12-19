@@ -75,7 +75,7 @@ def state(rio):
         try:
             saida = rio.recv(bufferSize, 0)
             resposta = json.loads(saida.decode('utf-8'))
-            print(resposta)
+            print(resposta, flush=True)
         except:
             print('Erro de transmissão')
 
@@ -204,3 +204,5 @@ rio3.close()
 rio4.close()
 
 #bd20212.dcc023.2advanced.dev 52221 2019057195:12142021:713956ac462e3cc9736660c44697d3b6d91ffbe60ee2911114890582c2435f72+2019056890:12142021:d4ae8849f0d2f8ccf163b12a3fcf45908b61c8f2239f3806fe6292f3428a37ce+3933183216bb827a7cdca38687047dd1a191952b1afb1a01bcfd92ade29ae224
+
+print()
