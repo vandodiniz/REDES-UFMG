@@ -1,6 +1,7 @@
 import socket
 import struct
 import json
+import traceback
 
 def entrada():
     while True:
@@ -40,13 +41,11 @@ def authreq(rio, adress):
     try:
         saida = rio.recv(bufferSize, 0)
         resposta = json.loads(saida.decode('utf-8'))
-        print(resposta)
         ESTADO.append(resposta['type'])
         if 'gameover' in ESTADO:
                 quit()
         return 0
     except:
-        print('Erro de transmissão')
         return 1
 
 def getcannons():
@@ -58,11 +57,9 @@ def getcannons():
     try:
         saida = rio1.recv(bufferSize, 0)
         resposta = json.loads(saida.decode('utf-8'))
-        print(resposta)
         VALID_CANNONS.append(resposta['cannons'])
         ESTADO.append(resposta['type'])
     except:
-        print('Erro de transmissão')
         getcannons()
 
 def getturn(turn, rio, adress):
@@ -76,15 +73,19 @@ def state(rio, boat, lista_resposta):
             for t in range(0,8):
                 saida = rio.recv(bufferSize, 0)
                 resposta = json.loads(saida.decode('utf-8'))
-                tam = len(resposta['ships'])
-                for c in range(0,tam):
-                    ponte = resposta['bridge']
-                    boat[ponte-1].append(resposta['ships'][c]['id'])
-                    ALL_BOATS.append(resposta['ships'][c]['id'])
-                ESTADO.append(resposta['type'])
+                if(turno != 272):
+                    tam = len(resposta['ships'])
+                    for c in range(0,tam):
+                        ponte = resposta['bridge']
+                        boat[ponte-1].append(resposta['ships'][c]['id'])
+                        ALL_BOATS.append(resposta['ships'][c]['id'])
+                    ESTADO.append(resposta['type'])
+                else:
+                    print('TERMINOOOOOOOOOOOOOOOOOOOOOOU')
                 lista_resposta[t] = resposta
             return 0
         except:
+            traceback.print_exc()
             print('erro de transmissão no state')
             return 1
 
@@ -96,7 +97,6 @@ def shot(rio, adress, cannon, id):
     try:
         saida = rio.recv(bufferSize, 0)
         resposta = json.loads(saida.decode('utf-8'))
-        print(resposta)
         #ESTADO.append(resposta['type'])
     except:
         #print('Erro de transmissão')
@@ -157,7 +157,6 @@ for c in range(0,4):
         rio4.connect(RIVER[3])
         rio4.settimeout(timeout)
 
-print('INICIANDO O JOGO: ')
 auth.append(authreq(rio1, RIVER[0]))
 while auth[0] == 1:
     auth[0] = (authreq(rio1, RIVER[0]))
@@ -175,7 +174,6 @@ while auth[3] == 1:
     auth[3] = (authreq(rio4, RIVER[3]))
 
 if auth == [0,0,0,0]:
-    print('AUTENTICAÇÃO COMPLETA')
     getcannons()
     turno = 0
 
@@ -294,7 +292,7 @@ if auth == [0,0,0,0]:
             print('erro ao atirar')
             
         turno += 1
-        #input('proximo round')
+        # input('proximo round')
         if 'gameover' in ESTADO:
             break
 
