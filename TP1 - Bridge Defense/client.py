@@ -73,21 +73,18 @@ def getturn(turn):
     rio3.sendto(entrada, RIVER[2])
     rio4.sendto(entrada, RIVER[3])
     
-def state(rio):
-
+def state(rio, boat):
         try:
-            saida = rio.recv(bufferSize, 0)
-            resposta = json.loads(saida.decode('utf-8'))
-            print(resposta, flush=True)
-
-            for c in range(0,len(resposta)):
-                BOATS.append(resposta['ships'][c]['id'])
-                
-            ESTADO.append(resposta['type'])
-            
+            for t in range(0,8):
+                saida = rio.recv(bufferSize, 0)
+                resposta = json.loads(saida.decode('utf-8'))
+                print(resposta, flush=True)
+                tam = len(resposta['ships'])
+                for c in range(0,tam):
+                    boat.append(resposta['ships'][c]['id'])
         except:
-            print('Erro de transmissão')
-            #state(rio)
+            print('erro de transmissão')
+            
 
 def shot(rio, adress, cannon, id):
     entrada = json.dumps({"type": "shot", "auth": SAG, "cannon": cannon, "id": id}).encode('utf-8')
@@ -97,10 +94,10 @@ def shot(rio, adress, cannon, id):
     try:
         saida = rio.recv(bufferSize, 0)
         resposta = json.loads(saida.decode('utf-8'))
-        print(resposta, flush=True)
+        #print(resposta, flush=True)
         ESTADO.append(resposta['type'])
     except:
-        print('Erro de transmissão')
+        #print('Erro de transmissão')
         shot(rio, adress, cannon, id)
 
             
@@ -124,9 +121,14 @@ RIVER = [0,0,0,0]
 VALID_PORTS = [52221,52222,52223,52224]
 VALID_SERVER = 'bd20212.dcc023.2advanced.dev'
 VALID_CANNONS = []
-BOATS = []
+BOATS_1 = []
+BOATS_2 = []
+BOATS_3 = []
+BOATS_4 = []
+
 ESTADO = []
 RIOS = [1,2,3,4]
+timeout = 0.5
 
 rio1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 rio2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -143,19 +145,19 @@ for c in range(0,4):
     if PORT == VALID_PORTS[0]:
         RIVER[0]=(SERVER, PORT)
         rio1.connect(RIVER[0])
-        rio1.settimeout(1) 
+        rio1.settimeout(timeout) 
     elif PORT == VALID_PORTS[1]:
         RIVER[1]=(SERVER, PORT)
         rio2.connect(RIVER[1])
-        rio2.settimeout(1) 
+        rio2.settimeout(timeout) 
     elif PORT == VALID_PORTS[2]:
         RIVER[2]=(SERVER, PORT)
         rio3.connect(RIVER[2])
-        rio3.settimeout(1)
+        rio3.settimeout(timeout)
     elif PORT == VALID_PORTS[3]:
         RIVER[3]=(SERVER, PORT)
         rio4.connect(RIVER[3])
-        rio4.settimeout(1)
+        rio4.settimeout(timeout)
 
 print('INICIANDO O JOGO: ')
 auth.append(authreq(rio1, RIVER[0]))
@@ -179,37 +181,49 @@ if auth == [0,0,0,0]:
     getcannons()
     turno = 0
 
-    while turno<5:
-        print(f'ESTADO: {ESTADO}')
+    while True:
+        print(f'TURNO {turno}')
         getturn(turno)
 
-        print('\nRIO 1:')
-        for c in range(0,8):
-            state(rio1)
-
-        print('\nRIO 2:')
-        for c in range(0,8):
-            state(rio2)
-
-        print('\nRIO 3:')
-        for c in range(0,8):
-            state(rio3)
-       
-        print('\nRIO 4:')
-        for c in range(0,8):
-            state(rio4)
-
-        print('NAVIOS DISPONIVEIS:', end=' ')
+        #print('\nRIO 1:')
+        state(rio1, BOATS_1)
         
-        print (BOATS)
-        for x in VALID_CANNONS[0]:
-            r = int(input(f'Em qual rio voce quer que o canhão {x} dispare? (1 a 4): '))
-            while r not in RIOS:
-                r = int(input(f'Rio inválido! Digite novamente (1 a 4): '))
+        #print('\nRIO 2:')
+        state(rio2, BOATS_2)
 
-            identificador = int(input(f'Digite o ID do navio  que o canhão {x} disparará: '))
-            while identificador not in BOATS:
-                identificador = int(input(f'Barco inexistente! Digite um disponível: {BOATS}: '))
+        #print('\nRIO 3:')
+        state(rio3, BOATS_3)
+       
+        #print('\nRIO 4:')
+        state(rio4, BOATS_4)
+
+        #print('NAVIOS DISPONIVEIS:', end=' ')
+        
+        #print (BOATS)
+
+        print(BOATS_1)
+        print(BOATS_2)
+        print(BOATS_3)
+        print(BOATS_4)
+        input()
+
+        for x in VALID_CANNONS[0]:
+            if x[1] == 0:
+                r = 1
+                identificador = BOATS_1[0]
+            if x[1] == 1:
+                r = 1
+                identificador = BOATS_1[0]
+            if x[1] == 2:
+                r = 2
+                identificador = BOATS_2[0]
+            if x[1] == 3:
+                r = 3
+                identificador = BOATS_3[0]
+            if x[1] == 4:
+                r = 4
+                identificador = BOATS_4[0]
+                
             if r == 1:
                 shot(rio1, RIVER[0], x, identificador)
             if r == 2:
@@ -218,10 +232,18 @@ if auth == [0,0,0,0]:
                 shot(rio3, RIVER[2], x, identificador)
             if r == 4:
                 shot(rio4, RIVER[3], x, identificador)
+            if 'gameover' in ESTADO:
+                break
         turno += 1
-        BOATS.clear()
+        BOATS_1.clear()
+        BOATS_2.clear()
+        BOATS_3.clear()
+        BOATS_4.clear()
+        if 'gameover' in ESTADO:
+            break
 
 else:
     print('FALHA NA AUTENTICAÇÃO')
-    quit()
-    
+
+print('Gameover! Score: ')
+quit()
