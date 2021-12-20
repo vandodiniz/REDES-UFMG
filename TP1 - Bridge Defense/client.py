@@ -85,8 +85,10 @@ def state(rio, boat):
                     boat[ponte-1].append(resposta['ships'][c]['id'])
                     ALL_BOATS.append(resposta['ships'][c]['id'])
                 ESTADO.append(resposta['type'])
+            return 0
         except:
             print('erro de transmissão')
+            return 1
             
 
 def shot(rio, adress, cannon, id):
@@ -186,23 +188,52 @@ if auth == [0,0,0,0]:
         BOATS_2 = [[],[],[],[],[],[],[],[]]
         BOATS_3 = [[],[],[],[],[],[],[],[]]
         BOATS_4 = [[],[],[],[],[],[],[],[]]
+        error = [0,0,0,0]
         print(f'TURNO {turno}')
+        
+        
+        
+        
+
+
+
+
         getturn(turno)
 
         print('\nRIO 1:')
-        state(rio1, BOATS_1)
-        
+        error[0] = state(rio1, BOATS_1)
+        while 1 in error:
+            getturn(turno) 
+            error[0] = state(rio1, BOATS_1)
+
         print('\nRIO 2:')
-        state(rio2, BOATS_2)
+        error[1] = state(rio2, BOATS_2)
+        while 1 in error:
+            getturn(turno) 
+            error[1] = state(rio2, BOATS_2)
 
         print('\nRIO 3:')
-        state(rio3, BOATS_3)
+        error[2] = state(rio3, BOATS_3)
+        while 1 in error:
+            getturn(turno) 
+            error[2] = state(rio3, BOATS_3)
        
         print('\nRIO 4:')
-        state(rio4, BOATS_4)
+        error[3] = state(rio4, BOATS_4)
+        while 1 in error:
+            getturn(turno) 
+            error[3] = state(rio4, BOATS_4)
+
+
+
+
+
+
+
+
+
 
         print('NAVIOS DISPONIVEIS:', end=' ')
-        
         print (BOATS_1)
         print (BOATS_2)
         print (BOATS_3)
@@ -271,7 +302,7 @@ if auth == [0,0,0,0]:
             print('erro ao atirar')
             
         turno += 1
-        #input('proximo round')
+        input('proximo round')
         print(f'ESTADO {ESTADO}')
         if 'gameover' in ESTADO:
             break
