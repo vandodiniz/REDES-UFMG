@@ -202,7 +202,7 @@ if auth == [0,0,0,0]:
     getcannons()
     turno = 0
 
-    while turno < 274:
+    while turno < 275:
         RESPOSTA_RIO1 = ['', '', '', '', '', '', '', '']
         RESPOSTA_RIO2 = ['', '', '', '', '', '', '', '']
         RESPOSTA_RIO3 = ['', '', '', '', '', '', '', '']
@@ -216,31 +216,48 @@ if auth == [0,0,0,0]:
         print(f'TURNO {turno}')
 
         if turno <250: 
+            
             getturn(turno, rio1, RIVER[0])
             getturn(turno, rio2, RIVER[1])
             getturn(turno, rio3, RIVER[2])
             getturn(turno, rio4, RIVER[3])
 
+            cont = 0
             error[0] = state(rio1, BOATS_1, RESPOSTA_RIO1)
             while error[0] == 1:
                 getturn(turno, rio1, RIVER[0])
                 error[0] = state(rio1, BOATS_1, RESPOSTA_RIO1)
-
+                cont+=1
+                if cont==3:
+                    break
+            
+            cont=0
             error[1] = state(rio2, BOATS_2, RESPOSTA_RIO2)
             while error[1] == 1:
                 getturn(turno, rio2, RIVER[1])
                 error[1] = state(rio2, BOATS_2, RESPOSTA_RIO2)
+                cont+=1
+                if cont==3:
+                    break
             
+            cont=0
             error[2] = state(rio3, BOATS_3, RESPOSTA_RIO3)
             while error[2] == 1:
                 getturn(turno, rio3, RIVER[2])
                 error[2] = state(rio3, BOATS_3, RESPOSTA_RIO3)
+                cont+=1
+                if cont==3:
+                    break
             
+            cont=0            
             error[3] = state(rio4, BOATS_4, RESPOSTA_RIO4)
             while  error[3] == 1:
                 getturn(turno, rio4, RIVER[3])
                 error[3] = state(rio4, BOATS_4, RESPOSTA_RIO4)
-
+                cont+=1
+                if cont==3:
+                    break
+            
             print('\nRIO 1:')
             for c in RESPOSTA_RIO1:
                 print(c)
@@ -258,7 +275,19 @@ if auth == [0,0,0,0]:
                 print(c)
 
             else: 
+                getturn_272(turno)
+
+                print('\nRIO 1:')
+                state_272(rio1, BOATS_1)
                 
+                print('\nRIO 2:')
+                state_272(rio2, BOATS_2)
+
+                print('\nRIO 3:')
+                state_272(rio3, BOATS_3)
+            
+                print('\nRIO 4:')
+                state_272(rio4, BOATS_4)
 
         print('NAVIOS DISPONIVEIS:', end=' ')
         print(ALL_BOATS)
