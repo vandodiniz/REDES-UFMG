@@ -1,6 +1,7 @@
 import socket
 import struct
 import json
+VALIDACAO = '2019057000:21122021:fd41751065ed3b869ef705d4f4b56ee0a853659a4ee2ec3999d63f4a257368ad+2019057001:21122021:96bf30b7c93eea60e3e7c6783e840a64d51a236685b06a3561f57931e8b54227+5eb1322e40a8dcf937ef041265c5bf00b7f23f363590c771db6f5414ebcdbb1a'
 
 def entrada():
     while True:
@@ -9,7 +10,8 @@ def entrada():
         try:
             s = dados[0]
             p = int(dados[1])
-            n = '2019057195:12142021:713956ac462e3cc9736660c44697d3b6d91ffbe60ee2911114890582c2435f72+2019056890:12142021:d4ae8849f0d2f8ccf163b12a3fcf45908b61c8f2239f3806fe6292f3428a37ce+3933183216bb827a7cdca38687047dd1a191952b1afb1a01bcfd92ade29ae224'
+            n = VALIDACAO
+            #n = '2019057195:12142021:713956ac462e3cc9736660c44697d3b6d91ffbe60ee2911114890582c2435f72+2019056890:12142021:d4ae8849f0d2f8ccf163b12a3fcf45908b61c8f2239f3806fe6292f3428a37ce+3933183216bb827a7cdca38687047dd1a191952b1afb1a01bcfd92ade29ae224'
             break
         except:
             print('Entrada inválida! Tente no seguinte formato: "SERVER PORTA SAG"')
@@ -19,15 +21,15 @@ def entrada():
         dados = entrada.split(' ')
         s = dados[0]
         p = int(dados[1])
-        n = '2019057195:12142021:713956ac462e3cc9736660c44697d3b6d91ffbe60ee2911114890582c2435f72+2019056890:12142021:d4ae8849f0d2f8ccf163b12a3fcf45908b61c8f2239f3806fe6292f3428a37ce+3933183216bb827a7cdca38687047dd1a191952b1afb1a01bcfd92ade29ae224'
-        
+        #n = '2019057195:12142021:713956ac462e3cc9736660c44697d3b6d91ffbe60ee2911114890582c2435f72+2019056890:12142021:d4ae8849f0d2f8ccf163b12a3fcf45908b61c8f2239f3806fe6292f3428a37ce+3933183216bb827a7cdca38687047dd1a191952b1afb1a01bcfd92ade29ae224'
+        n = VALIDACAO
     while p not in VALID_PORTS:
         entrada = input('Porta inválidada! Digite novamente: ')
         dados = entrada.split(' ')
         s = dados[0]
         p = int(dados[1])
-        n = '2019057195:12142021:713956ac462e3cc9736660c44697d3b6d91ffbe60ee2911114890582c2435f72+2019056890:12142021:d4ae8849f0d2f8ccf163b12a3fcf45908b61c8f2239f3806fe6292f3428a37ce+3933183216bb827a7cdca38687047dd1a191952b1afb1a01bcfd92ade29ae224'
-
+        #n = '2019057195:12142021:713956ac462e3cc9736660c44697d3b6d91ffbe60ee2911114890582c2435f72+2019056890:12142021:d4ae8849f0d2f8ccf163b12a3fcf45908b61c8f2239f3806fe6292f3428a37ce+3933183216bb827a7cdca38687047dd1a191952b1afb1a01bcfd92ade29ae224'
+        n = VALIDACAO
     info =[s,p,n]
     return info
 
@@ -272,12 +274,12 @@ if auth == [0,0,0,0]:
             
         turno += 1
         #input('proximo round')
-        print(f'ESTADO {ESTADO}')
         if 'gameover' in ESTADO:
             break
 
 else:
     print('FALHA NA AUTENTICAÇÃO')
 
+print(f'ESTADO {ESTADO}')
 print('Gameover!')
 quit()
