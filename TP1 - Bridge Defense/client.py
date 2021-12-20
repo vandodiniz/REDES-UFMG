@@ -2,6 +2,7 @@ import socket
 import struct
 import json
 import traceback
+VALIDACAO = '2019057000:21122021:fd41751065ed3b869ef705d4f4b56ee0a853659a4ee2ec3999d63f4a257368ad+2019057001:21122021:96bf30b7c93eea60e3e7c6783e840a64d51a236685b06a3561f57931e8b54227+5eb1322e40a8dcf937ef041265c5bf00b7f23f363590c771db6f5414ebcdbb1a'
 
 def entrada():
     while True:
@@ -10,7 +11,8 @@ def entrada():
         try:
             s = dados[0]
             p = int(dados[1])
-            n = '2019057195:12142021:713956ac462e3cc9736660c44697d3b6d91ffbe60ee2911114890582c2435f72+2019056890:12142021:d4ae8849f0d2f8ccf163b12a3fcf45908b61c8f2239f3806fe6292f3428a37ce+3933183216bb827a7cdca38687047dd1a191952b1afb1a01bcfd92ade29ae224'
+            n = VALIDACAO
+            #n = '2019057195:12142021:713956ac462e3cc9736660c44697d3b6d91ffbe60ee2911114890582c2435f72+2019056890:12142021:d4ae8849f0d2f8ccf163b12a3fcf45908b61c8f2239f3806fe6292f3428a37ce+3933183216bb827a7cdca38687047dd1a191952b1afb1a01bcfd92ade29ae224'
             break
         except:
             print('Entrada inválida! Tente no seguinte formato: "SERVER PORTA SAG"')
@@ -20,15 +22,15 @@ def entrada():
         dados = entrada.split(' ')
         s = dados[0]
         p = int(dados[1])
-        n = '2019057195:12142021:713956ac462e3cc9736660c44697d3b6d91ffbe60ee2911114890582c2435f72+2019056890:12142021:d4ae8849f0d2f8ccf163b12a3fcf45908b61c8f2239f3806fe6292f3428a37ce+3933183216bb827a7cdca38687047dd1a191952b1afb1a01bcfd92ade29ae224'
-        
+        #n = '2019057195:12142021:713956ac462e3cc9736660c44697d3b6d91ffbe60ee2911114890582c2435f72+2019056890:12142021:d4ae8849f0d2f8ccf163b12a3fcf45908b61c8f2239f3806fe6292f3428a37ce+3933183216bb827a7cdca38687047dd1a191952b1afb1a01bcfd92ade29ae224'
+        n = VALIDACAO
     while p not in VALID_PORTS:
         entrada = input('Porta inválidada! Digite novamente: ')
         dados = entrada.split(' ')
         s = dados[0]
         p = int(dados[1])
-        n = '2019057195:12142021:713956ac462e3cc9736660c44697d3b6d91ffbe60ee2911114890582c2435f72+2019056890:12142021:d4ae8849f0d2f8ccf163b12a3fcf45908b61c8f2239f3806fe6292f3428a37ce+3933183216bb827a7cdca38687047dd1a191952b1afb1a01bcfd92ade29ae224'
-
+        #n = '2019057195:12142021:713956ac462e3cc9736660c44697d3b6d91ffbe60ee2911114890582c2435f72+2019056890:12142021:d4ae8849f0d2f8ccf163b12a3fcf45908b61c8f2239f3806fe6292f3428a37ce+3933183216bb827a7cdca38687047dd1a191952b1afb1a01bcfd92ade29ae224'
+        n = VALIDACAO
     info =[s,p,n]
     return info
 
@@ -68,12 +70,12 @@ def getturn(turn, rio, adress):
     rio.sendto(entrada, adress)
     
     
-def state(rio, boat, lista_resposta):
+def state(rio, boat, lista_resposta,turn):
         try:
             for t in range(0,8):
                 saida = rio.recv(bufferSize, 0)
                 resposta = json.loads(saida.decode('utf-8'))
-                if(turno != 272):
+                if(turn != 272):
                     tam = len(resposta['ships'])
                     for c in range(0,tam):
                         ponte = resposta['bridge']
@@ -126,7 +128,7 @@ VALID_CANNONS = []
 
 ESTADO = []
 RIOS = [1,2,3,4]
-timeout = 0.5
+timeout = 1
 
 rio1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 rio2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -177,7 +179,7 @@ if auth == [0,0,0,0]:
     getcannons()
     turno = 0
 
-    while turno < 274:
+    while turno < 273:
         RESPOSTA_RIO1 = ['', '', '', '', '', '', '', '']
         RESPOSTA_RIO2 = ['', '', '', '', '', '', '', '']
         RESPOSTA_RIO3 = ['', '', '', '', '', '', '', '']
@@ -195,25 +197,41 @@ if auth == [0,0,0,0]:
         getturn(turno, rio3, RIVER[2])
         getturn(turno, rio4, RIVER[3])
 
-        error[0] = state(rio1, BOATS_1, RESPOSTA_RIO1)
+        cont = 0
+        error[0] = state(rio1, BOATS_1, RESPOSTA_RIO1, turno)
         while error[0] == 1:
             getturn(turno, rio1, RIVER[0])
-            error[0] = state(rio1, BOATS_1, RESPOSTA_RIO1)
-
-        error[1] = state(rio2, BOATS_2, RESPOSTA_RIO2)
+            error[0] = state(rio1, BOATS_1, RESPOSTA_RIO1, turno)
+            cont +=1
+            if cont == 5:
+                break
+        
+        cont = 0
+        error[1] = state(rio2, BOATS_2, RESPOSTA_RIO2, turno)
         while error[1] == 1:
             getturn(turno, rio2, RIVER[1])
-            error[1] = state(rio2, BOATS_2, RESPOSTA_RIO2)
-            
-        error[2] = state(rio3, BOATS_3, RESPOSTA_RIO3)
+            error[1] = state(rio2, BOATS_2, RESPOSTA_RIO2, turno)
+            cont +=1
+            if cont == 5:
+                break
+
+        cont = 0   
+        error[2] = state(rio3, BOATS_3, RESPOSTA_RIO3,turno)
         while error[2] == 1:
             getturn(turno, rio3, RIVER[2])
-            error[2] = state(rio3, BOATS_3, RESPOSTA_RIO3)
-            
-        error[3] = state(rio4, BOATS_4, RESPOSTA_RIO4)
+            error[2] = state(rio3, BOATS_3, RESPOSTA_RIO3,turno)
+            cont +=1
+            if cont == 5:
+                break
+        
+        cont = 0
+        error[3] = state(rio4, BOATS_4, RESPOSTA_RIO4, turno)
         while  error[3] == 1:
             getturn(turno, rio4, RIVER[3])
-            error[3] = state(rio4, BOATS_4, RESPOSTA_RIO4)
+            error[3] = state(rio4, BOATS_4, RESPOSTA_RIO4, turno)
+            cont +=1
+            if cont == 5:
+                break
 
         print('\nRIO 1:')
         for c in RESPOSTA_RIO1:
