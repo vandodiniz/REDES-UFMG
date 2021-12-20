@@ -65,29 +65,27 @@ def getcannons():
         print('Erro de transmissão')
         getcannons()
 
-def getturn(turn):
+def getturn(turn, rio, adress):
     #ENVIO
     entrada = json.dumps({"type": "getturn", "auth": SAG, "turn": turn}).encode('utf-8')
-    rio1.sendto(entrada, RIVER[0])
-    rio2.sendto(entrada, RIVER[1])
-    rio3.sendto(entrada, RIVER[2])
-    rio4.sendto(entrada, RIVER[3])
+    rio.sendto(entrada, adress)
     
-def state(rio, boat):
+    
+def state(rio, boat, lista_resposta):
         try:
             for t in range(0,8):
                 saida = rio.recv(bufferSize, 0)
                 resposta = json.loads(saida.decode('utf-8'))
-                print(resposta, flush=True)
                 tam = len(resposta['ships'])
                 for c in range(0,tam):
                     ponte = resposta['bridge']
                     boat[ponte-1].append(resposta['ships'][c]['id'])
                     ALL_BOATS.append(resposta['ships'][c]['id'])
                 ESTADO.append(resposta['type'])
+                lista_resposta[t] = resposta
             return 0
         except:
-            print('erro de transmissão')
+            print('erro de transmissão no state')
             return 1
             
 
@@ -99,7 +97,7 @@ def shot(rio, adress, cannon, id):
     try:
         saida = rio.recv(bufferSize, 0)
         resposta = json.loads(saida.decode('utf-8'))
-        print(resposta, flush=True)
+        print(resposta)
         #ESTADO.append(resposta['type'])
     except:
         #print('Erro de transmissão')
@@ -160,6 +158,7 @@ for c in range(0,4):
         rio4.connect(RIVER[3])
         rio4.settimeout(timeout)
 
+#quit()
 print('INICIANDO O JOGO: ')
 auth.append(authreq(rio1, RIVER[0]))
 while auth[0] == 1:
@@ -182,7 +181,11 @@ if auth == [0,0,0,0]:
     getcannons()
     turno = 0
 
-    while turno < 273:
+    while turno < 274:
+        RESPOSTA_RIO1 = ['', '', '', '', '', '', '', '']
+        RESPOSTA_RIO2 = ['', '', '', '', '', '', '', '']
+        RESPOSTA_RIO3 = ['', '', '', '', '', '', '', '']
+        RESPOSTA_RIO4 = ['', '', '', '', '', '', '', '']
         ALL_BOATS = []
         BOATS_1 = [[],[],[],[],[],[],[],[]]
         BOATS_2 = [[],[],[],[],[],[],[],[]]
@@ -190,55 +193,54 @@ if auth == [0,0,0,0]:
         BOATS_4 = [[],[],[],[],[],[],[],[]]
         error = [0,0,0,0]
         print(f'TURNO {turno}')
-        
-        
-        
-        
 
+        getturn(turno, rio1, RIVER[0])
+        getturn(turno, rio2, RIVER[1])
+        getturn(turno, rio3, RIVER[2])
+        getturn(turno, rio4, RIVER[3])
 
+        error[0] = state(rio1, BOATS_1, RESPOSTA_RIO1)
+        while error[0] == 1:
+            getturn(turno, rio1, RIVER[0])
+            error[0] = state(rio1, BOATS_1, RESPOSTA_RIO1)
 
-
-        getturn(turno)
+        error[1] = state(rio2, BOATS_2, RESPOSTA_RIO2)
+        while error[1] == 1:
+            getturn(turno, rio2, RIVER[1])
+            error[1] = state(rio2, BOATS_2, RESPOSTA_RIO2)
+        
+        error[2] = state(rio3, BOATS_3, RESPOSTA_RIO3)
+        while error[2] == 1:
+            getturn(turno, rio3, RIVER[2])
+            error[2] = state(rio3, BOATS_3, RESPOSTA_RIO3)
+        
+        error[3] = state(rio4, BOATS_4, RESPOSTA_RIO4)
+        while  error[3] == 1:
+            getturn(turno, rio4, RIVER[3])
+            error[3] = state(rio4, BOATS_4, RESPOSTA_RIO4)
 
         print('\nRIO 1:')
-        error[0] = state(rio1, BOATS_1)
-        while 1 in error:
-            getturn(turno) 
-            error[0] = state(rio1, BOATS_1)
+        for c in RESPOSTA_RIO1:
+            print(c)
 
         print('\nRIO 2:')
-        error[1] = state(rio2, BOATS_2)
-        while 1 in error:
-            getturn(turno) 
-            error[1] = state(rio2, BOATS_2)
+        for c in RESPOSTA_RIO2:
+            print(c)
 
         print('\nRIO 3:')
-        error[2] = state(rio3, BOATS_3)
-        while 1 in error:
-            getturn(turno) 
-            error[2] = state(rio3, BOATS_3)
-       
+        for c in RESPOSTA_RIO3:
+            print(c)
+
         print('\nRIO 4:')
-        error[3] = state(rio4, BOATS_4)
-        while 1 in error:
-            getturn(turno) 
-            error[3] = state(rio4, BOATS_4)
-
-
-
-
-
-
-
-
-
+        for c in RESPOSTA_RIO4:
+            print(c)
 
         print('NAVIOS DISPONIVEIS:', end=' ')
-        print (BOATS_1)
-        print (BOATS_2)
-        print (BOATS_3)
-        print (BOATS_4)
         print(ALL_BOATS)
+        print ("RIO 1: ", BOATS_1)
+        print ("RIO 2: ", BOATS_2)
+        print ("RIO 3: ", BOATS_3)
+        print ("RIO 4: ", BOATS_4)
 
         try:
             for x in VALID_CANNONS[0]:
@@ -302,13 +304,13 @@ if auth == [0,0,0,0]:
             print('erro ao atirar')
             
         turno += 1
-        input('proximo round')
-        print(f'ESTADO {ESTADO}')
+        #input('proximo round')
         if 'gameover' in ESTADO:
             break
 
 else:
     print('FALHA NA AUTENTICAÇÃO')
 
+print(f'ESTADO {ESTADO}')
 print('Gameover!')
 quit()
