@@ -78,10 +78,11 @@ def state(rio, boat):
             for t in range(0,8):
                 saida = rio.recv(bufferSize, 0)
                 resposta = json.loads(saida.decode('utf-8'))
-                #print(resposta, flush=True)
+                print(resposta, flush=True)
                 tam = len(resposta['ships'])
                 for c in range(0,tam):
                     boat.append(resposta['ships'][c]['id'])
+                    ALL_BOATS.append(resposta['ships'][c]['id'])
         except:
             print('erro de transmissão')
             
@@ -122,6 +123,7 @@ RIVER = [0,0,0,0]
 VALID_PORTS = [52221,52222,52223,52224]
 VALID_SERVER = 'bd20212.dcc023.2advanced.dev'
 VALID_CANNONS = []
+ALL_BOATS = []
 BOATS_1 = []
 BOATS_2 = []
 BOATS_3 = []
@@ -206,65 +208,35 @@ if auth == [0,0,0,0]:
             if x[1] == 0:
                 r = 1
                 if len(BOATS_1) == 0:
-                    if len(BOATS_2) == 0:
-                        if len(BOATS_3) == 0:
-                            identificador = BOATS_4[0]
-                        else:
-                            identificador = BOATS_3[0]
-                    else:
-                        identificador = BOATS_2[0]
+                    identificador = ALL_BOATS[0]
                 else:
                     identificador = BOATS_1[0]
                 
             if x[1] == 1:
                 r = 1
                 if len(BOATS_1) == 0:
-                    if len(BOATS_2) == 0:
-                        if len(BOATS_3) == 0:
-                            identificador = BOATS_4[0]
-                        else:
-                            identificador = BOATS_3[0]
-                    else:
-                        identificador = BOATS_2[0]
+                    identificador = ALL_BOATS[0]
                 else:
                     identificador = BOATS_1[0]
                 
             if x[1] == 2:
                 r = 2
                 if len(BOATS_2) == 0:
-                    if len(BOATS_1) == 0:
-                        if len(BOATS_3) == 0:
-                            identificador = BOATS_4[0]
-                        else:
-                            identificador = BOATS_3[0]
-                    else:
-                        identificador = BOATS_1[0]
+                    identificador = ALL_BOATS[0]
                 else:
                     identificador = BOATS_2[0]
                 
             if x[1] == 3:
                 r = 3
                 if len(BOATS_3) == 0:
-                    if len(BOATS_2) == 0:
-                        if len(BOATS_1) == 0:
-                            identificador = BOATS_4[0]
-                        else:
-                            identificador = BOATS_1[0]
-                    else:
-                        identificador = BOATS_2[0]
+                    identificador = ALL_BOATS[0]
                 else:
                     identificador = BOATS_3[0]
                 
             if x[1] == 4:
                 r = 4
                 if len(BOATS_4) == 0:
-                    if len(BOATS_2) == 0:
-                        if len(BOATS_3) == 0:
-                            identificador = BOATS_1[0]
-                        else:
-                            identificador = BOATS_3[0]
-                    else:
-                        identificador = BOATS_2[0]
+                    identificador = ALL_BOATS[0]
                 else:
                     identificador = BOATS_4[0]
                 
@@ -283,6 +255,7 @@ if auth == [0,0,0,0]:
         BOATS_2.clear()
         BOATS_3.clear()
         BOATS_4.clear()
+        ALL_BOATS.clear()
         if 'gameover' in ESTADO:
             break
 
