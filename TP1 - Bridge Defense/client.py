@@ -84,6 +84,7 @@ def state(rio, boat):
                     ponte = resposta['bridge']
                     boat[ponte-1].append(resposta['ships'][c]['id'])
                     ALL_BOATS.append(resposta['ships'][c]['id'])
+                ESTADO.append(resposta['type'])
         except:
             print('erro de transmissão')
             
@@ -96,8 +97,8 @@ def shot(rio, adress, cannon, id):
     try:
         saida = rio.recv(bufferSize, 0)
         resposta = json.loads(saida.decode('utf-8'))
-        #print(resposta, flush=True)
-        ESTADO.append(resposta['type'])
+        print(resposta, flush=True)
+        #ESTADO.append(resposta['type'])
     except:
         #print('Erro de transmissão')
         shot(rio, adress, cannon, id)
@@ -107,28 +108,22 @@ def quit():
     #ENVIO
     entrada = json.dumps({"type": "quit", "auth": SAG}).encode('utf-8')                          
     rio1.sendto(entrada, RIVER[0])
-    rio2.sendto(entrada, RIVER[1])
-    rio3.sendto(entrada, RIVER[2])
-    rio4.sendto(entrada, RIVER[3])
+    
     rio1.close()
     rio2.close()
     rio3.close()
     rio4.close()
     print('Jogo finalizado com sucesso!')
     exit()
-        
-#bd20212.dcc023.2advanced.dev 52221
+
+    #bd20212.dcc023.2advanced.dev 52221
+
 #DEFININDO AS ESPECIFICAÇÕES DO SERVIDOR E PEGANDO AS INFORMAÇÕES DO TECLADO
 bufferSize = 4096
 RIVER = [0,0,0,0]
 VALID_PORTS = [52221,52222,52223,52224]
 VALID_SERVER = 'bd20212.dcc023.2advanced.dev'
 VALID_CANNONS = []
-ALL_BOATS = []
-BOATS_1 = [[],[],[],[],[],[],[],[]]
-BOATS_2 = [[],[],[],[],[],[],[],[]]
-BOATS_3 = [[],[],[],[],[],[],[],[]]
-BOATS_4 = [[],[],[],[],[],[],[],[]]
 
 ESTADO = []
 RIOS = [1,2,3,4]
@@ -185,7 +180,12 @@ if auth == [0,0,0,0]:
     getcannons()
     turno = 0
 
-    while True:
+    while turno < 273:
+        ALL_BOATS = []
+        BOATS_1 = [[],[],[],[],[],[],[],[]]
+        BOATS_2 = [[],[],[],[],[],[],[],[]]
+        BOATS_3 = [[],[],[],[],[],[],[],[]]
+        BOATS_4 = [[],[],[],[],[],[],[],[]]
         print(f'TURNO {turno}')
         getturn(turno)
 
@@ -209,54 +209,55 @@ if auth == [0,0,0,0]:
         print (BOATS_4)
         print(ALL_BOATS)
 
-        for x in VALID_CANNONS[0]:
-            p = x[0]
-                
-            if x[1] == 0:
-                r = 1
-                if len(BOATS_1[p-1][0]) > 0:
-                    identificador = BOATS_1[p-1][0]
-                else:
-                    identificador = ALL_BOATS[0]
+        try:
+            for x in VALID_CANNONS[0]:
+                p = x[0]
+                    
+                if x[1] == 0:
+                    r = 1
+                    if len(BOATS_1[p-1]) > 0:
+                        identificador = BOATS_1[p-1][0]
+                    else:
+                        identificador = ALL_BOATS[0]
 
-            if x[1] == 1:
-                r = 1
-                if len(BOATS_1[p-1][0]) > 0:
-                    identificador = BOATS_1[p-1][0]
-                elif len(BOATS_2[p-1][0]) > 0:
+                if x[1] == 1:
+                    r = 1
+                    if len(BOATS_1[p-1]) > 0:
+                        identificador = BOATS_1[p-1][0]
+                    elif len(BOATS_2[p-1]) > 0:
+                        r = 2
+                        identificador = BOATS_2[p-1][0]
+                    else:
+                        identificador = ALL_BOATS[0]
+                    
+                if x[1] == 2:
                     r = 2
-                    identificador = BOATS_2[p-1][0]
-                else:
-                    identificador = ALL_BOATS[0]
-                
-            if x[1] == 2:
-                r = 2
-                if len(BOATS_2[p-1][0]) > 0:
-                    identificador = BOATS_2[p-1][0]
-                elif len(BOATS_3[p-1][0]) > 0:
+                    if len(BOATS_2[p-1]) > 0:
+                        identificador = BOATS_2[p-1][0]
+                    elif len(BOATS_3[p-1]) > 0:
+                        r = 3
+                        identificador = BOATS_3[p-1][0]
+                    else:
+                        identificador = ALL_BOATS[0]
+                    
+                if x[1] == 3:
                     r = 3
-                    identificador = BOATS_3[p-1][0]
-                else:
-                    identificador = ALL_BOATS[0]
-                
-            if x[1] == 3:
-                r = 3
-                if len(BOATS_3[p-1][0]) > 0:
-                    identificador = BOATS_3[p-1][0]
-                elif len(BOATS_4[p-1][0]) > 0:
+                    if len(BOATS_3[p-1]) > 0:
+                        identificador = BOATS_3[p-1][0]
+                    elif len(BOATS_4[p-1]) > 0:
+                        r = 4
+                        identificador = BOATS_4[p-1][0]
+                    else:
+                        identificador = ALL_BOATS[0]
+                    
+                if x[1] == 4:
                     r = 4
-                    identificador = BOATS_4[p-1][0]
-                else:
-                    identificador = ALL_BOATS[0]
-                
-            if x[1] == 4:
-                r = 4
-                if len(BOATS_4[p-1][0]) > 0:
-                    identificador = BOATS_4[p-1][0]
-                else:
-                    identificador = ALL_BOATS[0]
-                
-            try: 
+                    if len(BOATS_4[p-1]) > 0:
+                        identificador = BOATS_4[p-1][0]
+                    else:
+                        identificador = ALL_BOATS[0]
+                    
+        
                 if r == 1:
                     shot(rio1, RIVER[0], x, identificador)
                 if r == 2:
@@ -265,22 +266,18 @@ if auth == [0,0,0,0]:
                     shot(rio3, RIVER[2], x, identificador)
                 if r == 4:
                     shot(rio4, RIVER[3], x, identificador)
-            except:
-                print('erro ao atirar')
-
-            if 'gameover' in ESTADO:
-                break
+            
+        except:
+            print('erro ao atirar')
+            
         turno += 1
-        BOATS_1.clear()
-        BOATS_2.clear()
-        BOATS_3.clear()
-        BOATS_4.clear()
-        ALL_BOATS.clear()
+        #input('proximo round')
+        print(f'ESTADO {ESTADO}')
         if 'gameover' in ESTADO:
             break
 
 else:
     print('FALHA NA AUTENTICAÇÃO')
 
-print('Gameover! Score: ')
+print('Gameover!')
 quit()
