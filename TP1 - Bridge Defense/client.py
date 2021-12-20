@@ -158,7 +158,6 @@ for c in range(0,4):
         rio4.connect(RIVER[3])
         rio4.settimeout(timeout)
 
-#quit()
 print('INICIANDO O JOGO: ')
 auth.append(authreq(rio1, RIVER[0]))
 while auth[0] == 1:
