@@ -78,7 +78,7 @@ def state(rio, boat):
             for t in range(0,8):
                 saida = rio.recv(bufferSize, 0)
                 resposta = json.loads(saida.decode('utf-8'))
-                print(resposta, flush=True)
+                #print(resposta, flush=True)
                 tam = len(resposta['ships'])
                 for c in range(0,tam):
                     boat.append(resposta['ships'][c]['id'])
@@ -114,7 +114,8 @@ def quit():
     rio4.close()
     print('Jogo finalizado com sucesso!')
     exit()
-
+        
+#bd20212.dcc023.2advanced.dev 52221
 #DEFININDO AS ESPECIFICAÇÕES DO SERVIDOR E PEGANDO AS INFORMAÇÕES DO TECLADO
 bufferSize = 4096
 RIVER = [0,0,0,0]
@@ -201,28 +202,71 @@ if auth == [0,0,0,0]:
         
         #print (BOATS)
 
-        print(BOATS_1)
-        print(BOATS_2)
-        print(BOATS_3)
-        print(BOATS_4)
-        input()
-
         for x in VALID_CANNONS[0]:
             if x[1] == 0:
                 r = 1
-                identificador = BOATS_1[0]
+                if len(BOATS_1) == 0:
+                    if len(BOATS_2) == 0:
+                        if len(BOATS_3) == 0:
+                            identificador = BOATS_4[0]
+                        else:
+                            identificador = BOATS_3[0]
+                    else:
+                        identificador = BOATS_2[0]
+                else:
+                    identificador = BOATS_1[0]
+                
             if x[1] == 1:
                 r = 1
-                identificador = BOATS_1[0]
+                if len(BOATS_1) == 0:
+                    if len(BOATS_2) == 0:
+                        if len(BOATS_3) == 0:
+                            identificador = BOATS_4[0]
+                        else:
+                            identificador = BOATS_3[0]
+                    else:
+                        identificador = BOATS_2[0]
+                else:
+                    identificador = BOATS_1[0]
+                
             if x[1] == 2:
                 r = 2
-                identificador = BOATS_2[0]
+                if len(BOATS_2) == 0:
+                    if len(BOATS_1) == 0:
+                        if len(BOATS_3) == 0:
+                            identificador = BOATS_4[0]
+                        else:
+                            identificador = BOATS_3[0]
+                    else:
+                        identificador = BOATS_1[0]
+                else:
+                    identificador = BOATS_2[0]
+                
             if x[1] == 3:
                 r = 3
-                identificador = BOATS_3[0]
+                if len(BOATS_3) == 0:
+                    if len(BOATS_2) == 0:
+                        if len(BOATS_1) == 0:
+                            identificador = BOATS_4[0]
+                        else:
+                            identificador = BOATS_1[0]
+                    else:
+                        identificador = BOATS_2[0]
+                else:
+                    identificador = BOATS_3[0]
+                
             if x[1] == 4:
                 r = 4
-                identificador = BOATS_4[0]
+                if len(BOATS_4) == 0:
+                    if len(BOATS_2) == 0:
+                        if len(BOATS_3) == 0:
+                            identificador = BOATS_1[0]
+                        else:
+                            identificador = BOATS_3[0]
+                    else:
+                        identificador = BOATS_2[0]
+                else:
+                    identificador = BOATS_4[0]
                 
             if r == 1:
                 shot(rio1, RIVER[0], x, identificador)
