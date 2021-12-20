@@ -81,7 +81,8 @@ def state(rio, boat):
                 print(resposta, flush=True)
                 tam = len(resposta['ships'])
                 for c in range(0,tam):
-                    boat.append(resposta['ships'][c]['id'])
+                    ponte = resposta['bridge']
+                    boat[ponte-1].append(resposta['ships'][c]['id'])
                     ALL_BOATS.append(resposta['ships'][c]['id'])
         except:
             print('erro de transmissão')
@@ -124,10 +125,10 @@ VALID_PORTS = [52221,52222,52223,52224]
 VALID_SERVER = 'bd20212.dcc023.2advanced.dev'
 VALID_CANNONS = []
 ALL_BOATS = []
-BOATS_1 = []
-BOATS_2 = []
-BOATS_3 = []
-BOATS_4 = []
+BOATS_1 = [[],[],[],[],[],[],[],[]]
+BOATS_2 = [[],[],[],[],[],[],[],[]]
+BOATS_3 = [[],[],[],[],[],[],[],[]]
+BOATS_4 = [[],[],[],[],[],[],[],[]]
 
 ESTADO = []
 RIOS = [1,2,3,4]
@@ -188,66 +189,85 @@ if auth == [0,0,0,0]:
         print(f'TURNO {turno}')
         getturn(turno)
 
-        #print('\nRIO 1:')
+        print('\nRIO 1:')
         state(rio1, BOATS_1)
         
-        #print('\nRIO 2:')
+        print('\nRIO 2:')
         state(rio2, BOATS_2)
 
-        #print('\nRIO 3:')
+        print('\nRIO 3:')
         state(rio3, BOATS_3)
        
-        #print('\nRIO 4:')
+        print('\nRIO 4:')
         state(rio4, BOATS_4)
 
-        #print('NAVIOS DISPONIVEIS:', end=' ')
+        print('NAVIOS DISPONIVEIS:', end=' ')
         
-        #print (BOATS)
+        print (BOATS_1)
+        print (BOATS_2)
+        print (BOATS_3)
+        print (BOATS_4)
+        print(ALL_BOATS)
 
         for x in VALID_CANNONS[0]:
+            p = x[0]
+                
             if x[1] == 0:
                 r = 1
-                if len(BOATS_1) == 0:
-                    identificador = ALL_BOATS[0]
+                if len(BOATS_1[p-1][0]) > 0:
+                    identificador = BOATS_1[p-1][0]
                 else:
-                    identificador = BOATS_1[0]
-                
+                    identificador = ALL_BOATS[0]
+
             if x[1] == 1:
                 r = 1
-                if len(BOATS_1) == 0:
-                    identificador = ALL_BOATS[0]
+                if len(BOATS_1[p-1][0]) > 0:
+                    identificador = BOATS_1[p-1][0]
+                elif len(BOATS_2[p-1][0]) > 0:
+                    r = 2
+                    identificador = BOATS_2[p-1][0]
                 else:
-                    identificador = BOATS_1[0]
+                    identificador = ALL_BOATS[0]
                 
             if x[1] == 2:
                 r = 2
-                if len(BOATS_2) == 0:
-                    identificador = ALL_BOATS[0]
+                if len(BOATS_2[p-1][0]) > 0:
+                    identificador = BOATS_2[p-1][0]
+                elif len(BOATS_3[p-1][0]) > 0:
+                    r = 3
+                    identificador = BOATS_3[p-1][0]
                 else:
-                    identificador = BOATS_2[0]
+                    identificador = ALL_BOATS[0]
                 
             if x[1] == 3:
                 r = 3
-                if len(BOATS_3) == 0:
-                    identificador = ALL_BOATS[0]
+                if len(BOATS_3[p-1][0]) > 0:
+                    identificador = BOATS_3[p-1][0]
+                elif len(BOATS_4[p-1][0]) > 0:
+                    r = 4
+                    identificador = BOATS_4[p-1][0]
                 else:
-                    identificador = BOATS_3[0]
+                    identificador = ALL_BOATS[0]
                 
             if x[1] == 4:
                 r = 4
-                if len(BOATS_4) == 0:
-                    identificador = ALL_BOATS[0]
+                if len(BOATS_4[p-1][0]) > 0:
+                    identificador = BOATS_4[p-1][0]
                 else:
-                    identificador = BOATS_4[0]
+                    identificador = ALL_BOATS[0]
                 
-            if r == 1:
-                shot(rio1, RIVER[0], x, identificador)
-            if r == 2:
-                shot(rio2, RIVER[1], x, identificador)
-            if r == 3:
-                shot(rio3, RIVER[2], x, identificador)
-            if r == 4:
-                shot(rio4, RIVER[3], x, identificador)
+            try: 
+                if r == 1:
+                    shot(rio1, RIVER[0], x, identificador)
+                if r == 2:
+                    shot(rio2, RIVER[1], x, identificador)
+                if r == 3:
+                    shot(rio3, RIVER[2], x, identificador)
+                if r == 4:
+                    shot(rio4, RIVER[3], x, identificador)
+            except:
+                print('erro ao atirar')
+
             if 'gameover' in ESTADO:
                 break
         turno += 1
