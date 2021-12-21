@@ -1,9 +1,7 @@
 import socket
-import struct
 import json
 import traceback
-VALIDADOR = '2019057012:20122021:c770fed0b8e956ee92e80f2ab17ec54713c6ea1e8354d06b49ac0b857526331b+2019057013:20122021:18907902a0342d7799b09e6ded18e3e4aba9ec332ed3c39a6b537a353cf91676+f9184f1f99b735b7c88fb015bea7db97ca6fc0230370d2531138555217fa29d4'
-
+VALIDADOR = '2019057195:12142021:713956ac462e3cc9736660c44697d3b6d91ffbe60ee2911114890582c2435f72+2019056890:12142021:d4ae8849f0d2f8ccf163b12a3fcf45908b61c8f2239f3806fe6292f3428a37ce+3933183216bb827a7cdca38687047dd1a191952b1afb1a01bcfd92ade29ae224'
 def entrada():
     while True:
         entrada = input('Digite sua entrada: ')
@@ -59,6 +57,7 @@ def getcannons():
     try:
         saida = rio1.recv(bufferSize, 0)
         resposta = json.loads(saida.decode('utf-8'))
+        print(resposta)
         VALID_CANNONS.append(resposta['cannons'])
         ESTADO.append(resposta['type'])
     except:
@@ -77,14 +76,12 @@ def state(rio, boat, lista_resposta):
             for t in range(0,alcance):
                 saida = rio.recv(bufferSize, 0)
                 resposta = json.loads(saida.decode('utf-8'))
-                print(resposta, " ========== RESPOSTA")
-                print(turno, " ========== TURNO")
                 if(turno != 272):
                     tam = len(resposta['ships'])
                     for c in range(0,tam):
                         ponte = resposta['bridge']
-                        boat[ponte-1].append(resposta['ships'][c]['id'])
-                        ALL_BOATS.append(resposta['ships'][c]['id'])
+                        boat[ponte-1].append(resposta['ships'][c])
+                        ALL_BOATS.append(resposta['ships'][c])
                     ESTADO.append(resposta['type'])
                 else:
                     print('TERMINOOOOOOOOOOOOOOOOOOOOOOU')
@@ -96,7 +93,7 @@ def state(rio, boat, lista_resposta):
                     lista_resposta[t] = resposta
             return 0
         except:
-            traceback.print_exc()
+            #traceback.print_exc()
             print('erro de transmissão no state')
             return 1
 
@@ -108,6 +105,7 @@ def shot(rio, adress, cannon, id):
     try:
         saida = rio.recv(bufferSize, 0)
         resposta = json.loads(saida.decode('utf-8'))
+        print(resposta)
         #ESTADO.append(resposta['type'])
     except:
         #print('Erro de transmissão')
@@ -125,8 +123,19 @@ def quit():
     print('Jogo finalizado com sucesso!')
     exit()
 
-    #PAO
     #bd20212.dcc023.2advanced.dev 52221
+
+def weakest(_listaBarcos):
+    betterBoat = _listaBarcos[0]
+    for i in _listaBarcos:
+        if i['hull'] == 'frigate':
+            return i
+        elif i['hull'] == 'destroyer':
+            betterBoat = i
+        elif betterBoat['hull'] != 'destroyer':
+            betterBoat = i
+    return betterBoat
+
 
 #DEFININDO AS ESPECIFICAÇÕES DO SERVIDOR E PEGANDO AS INFORMAÇÕES DO TECLADO
 bufferSize = 4096
@@ -137,7 +146,7 @@ VALID_CANNONS = []
 
 ESTADO = []
 RIOS = [1,2,3,4]
-timeout = 0.1
+timeout = 0.5
 
 rio1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 rio2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -206,14 +215,14 @@ if auth == [0,0,0,0]:
         getturn(turno, rio3, RIVER[2])
         getturn(turno, rio4, RIVER[3])
         
-        print(f'DEPOIS DOS GET TURN')
+        
 
         error[0] = state(rio1, BOATS_1, RESPOSTA_RIO1)
         
         while error[0] == 1:
             getturn(turno, rio1, RIVER[0])
             error[0] = state(rio1, BOATS_1, RESPOSTA_RIO1)
-        print(f'DEPOIS DO LOOP NO STATE 1')
+        
 
         print('\nRIO 1:')
         for c in RESPOSTA_RIO1:
@@ -223,7 +232,7 @@ if auth == [0,0,0,0]:
         while error[1] == 1:
             getturn(turno, rio2, RIVER[1])
             error[1] = state(rio2, BOATS_2, RESPOSTA_RIO2)
-        print(f'DEPOIS DO LOOP NO STATE 2')   
+        
 
         print('\nRIO 2:')
         for c in RESPOSTA_RIO2:
@@ -233,7 +242,7 @@ if auth == [0,0,0,0]:
         while error[2] == 1:
             getturn(turno, rio3, RIVER[2])
             error[2] = state(rio3, BOATS_3, RESPOSTA_RIO3)
-        print(f'DEPOIS DO LOOP NO STATE 3')      
+          
 
         print('\nRIO 3:')
         for c in RESPOSTA_RIO3:
@@ -243,60 +252,67 @@ if auth == [0,0,0,0]:
         while  error[3] == 1:
             getturn(turno, rio4, RIVER[3])
             error[3] = state(rio4, BOATS_4, RESPOSTA_RIO4)
-        print(f'DEPOIS DO LOOP NO STATE 4')
+        
 
 
         print('\nRIO 4:')
         for c in RESPOSTA_RIO4:
             print(c)
 
+        print('NAVIOS DISPONIVEIS:', end=' ')
+        print(ALL_BOATS)
+        print ('rio 1: ', BOATS_1)
+        print ('rio 2: ',BOATS_2)
+        print ('rio 3: ',BOATS_3)
+        print ('rio 4: ',BOATS_4)
+
         try:
-            for x in VALID_CANNONS[0]:
+            for x in VALID_CANNONS[0]:  #[[5,2], [5,4], [4,5]]   [1,2,3,4,5,6,7,8] [0,1,2,3,4]
                 p = x[0]
                     
                 if x[1] == 0:
                     r = 1
                     if len(BOATS_1[p-1]) > 0:
-                        identificador = BOATS_1[p-1][0]
+                        identificador = weakest(BOATS_1[p-1])['id']
                     else:
-                        identificador = ALL_BOATS[0]
+                        identificador = ALL_BOATS[0]['id']
 
                 if x[1] == 1:
                     r = 1
                     if len(BOATS_1[p-1]) > 0:
-                        identificador = BOATS_1[p-1][0]
+                        identificador = weakest(BOATS_1[p-1])['id']
                     elif len(BOATS_2[p-1]) > 0:
                         r = 2
-                        identificador = BOATS_2[p-1][0]
+                        identificador = weakest(BOATS_2[p-1])['id']
                     else:
-                        identificador = ALL_BOATS[0]
+                        identificador = ALL_BOATS[0]['id']
                     
                 if x[1] == 2:
                     r = 2
                     if len(BOATS_2[p-1]) > 0:
-                        identificador = BOATS_2[p-1][0]
+                        identificador = weakest(BOATS_2[p-1])['id']
                     elif len(BOATS_3[p-1]) > 0:
                         r = 3
-                        identificador = BOATS_3[p-1][0]
+                        identificador = weakest(BOATS_3[p-1])['id']
                     else:
-                        identificador = ALL_BOATS[0]
+                        identificador = ALL_BOATS[0]['id']
                     
                 if x[1] == 3:
                     r = 3
                     if len(BOATS_3[p-1]) > 0:
-                        identificador = BOATS_3[p-1][0]
+                        identificador = weakest(BOATS_3[p-1])['id']
                     elif len(BOATS_4[p-1]) > 0:
                         r = 4
-                        identificador = BOATS_4[p-1][0]
+                        identificador = weakest(BOATS_4[p-1])['id']
                     else:
-                        identificador = ALL_BOATS[0]
+                        identificador = ALL_BOATS[0]['id']
                     
                 if x[1] == 4:
                     r = 4
                     if len(BOATS_4[p-1]) > 0:
-                        identificador = BOATS_4[p-1][0]
+                        identificador = weakest(BOATS_4[p-1])['id']
                     else:
-                        identificador = ALL_BOATS[0]
+                        identificador = ALL_BOATS[0]['id']
                     
         
                 if r == 1:
@@ -319,6 +335,6 @@ if auth == [0,0,0,0]:
 else:
     print('FALHA NA AUTENTICAÇÃO')
 
-print(f'ESTADO {ESTADO}')
+#print(f'ESTADO {ESTADO}')
 print('Gameover!')
 quit()
