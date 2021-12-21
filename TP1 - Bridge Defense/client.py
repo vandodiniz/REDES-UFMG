@@ -77,6 +77,8 @@ def state(rio, boat, lista_resposta):
             for t in range(0,alcance):
                 saida = rio.recv(bufferSize, 0)
                 resposta = json.loads(saida.decode('utf-8'))
+                print(resposta, " ========== RESPOSTA")
+                print(turno, " ========== TURNO")
                 if(turno != 272):
                     tam = len(resposta['ships'])
                     for c in range(0,tam):
@@ -135,7 +137,7 @@ VALID_CANNONS = []
 
 ESTADO = []
 RIOS = [1,2,3,4]
-timeout = 0.3
+timeout = 0.1
 
 rio1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 rio2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -186,7 +188,7 @@ if auth == [0,0,0,0]:
     getcannons()
     turno = 0
 
-    while turno < 274:
+    while turno < 273:
         RESPOSTA_RIO1 = ['', '', '', '', '', '', '', '']
         RESPOSTA_RIO2 = ['', '', '', '', '', '', '', '']
         RESPOSTA_RIO3 = ['', '', '', '', '', '', '', '']
