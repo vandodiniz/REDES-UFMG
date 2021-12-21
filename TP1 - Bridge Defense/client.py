@@ -48,6 +48,7 @@ def authreq(rio, adress):
                 quit()
         return 0
     except:
+        print('ERRO DE TRANSMISAAO')
         return 1
 
 def getcannons():
@@ -128,7 +129,7 @@ VALID_CANNONS = []
 
 ESTADO = []
 RIOS = [1,2,3,4]
-timeout = 1
+timeout = 2
 
 rio1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 rio2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
