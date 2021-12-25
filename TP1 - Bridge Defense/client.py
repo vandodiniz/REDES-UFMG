@@ -124,15 +124,27 @@ def quit():
     #bd20212.dcc023.2advanced.dev 52221
 
 def weakest(_listaBarcos):
-    betterBoat = _listaBarcos[0]
-    for i in _listaBarcos:
-        if i['hull'] == 'frigate':
-            return i
-        elif i['hull'] == 'destroyer':
-            betterBoat = i
-        elif betterBoat['hull'] != 'destroyer':
-            betterBoat = i
-    return betterBoat
+    if r == FOCO:
+        betterBoat = _listaBarcos[0]
+        for i in _listaBarcos:
+            if i['hull'] == 'battleship':
+                return i
+            elif i['hull'] == 'frigate':
+                betterBoat = i
+            elif betterBoat['hull'] != 'frigate':
+                betterBoat = i
+        return betterBoat
+    
+    else:
+        betterBoat = _listaBarcos[0]
+        for i in _listaBarcos:
+            if i['hull'] == 'frigate':
+                return i
+            elif i['hull'] == 'destroyer':
+                betterBoat = i
+            elif betterBoat['hull'] != 'destroyer':
+                betterBoat = i
+        return betterBoat
 
 def refresh(id, lista):
     for c in lista:
@@ -292,6 +304,17 @@ def display():
         print(c.rjust(4), end='')
     print('\n')
 
+def _foco():
+
+    try:
+        FOCO = int(input('Qual rio focará os battleships? [1 a 4]: '))
+        while FOCO not in RIOS:
+            print
+            FOCO = int(input('Digite um rio válido [1 a 4]: '))
+    except:
+        print('Digite um número de 1 a 4!')
+        _foco()
+
 #DEFININDO AS ESPECIFICAÇÕES DO SERVIDOR E PEGANDO AS INFORMAÇÕES DO TECLADO
 bufferSize = 4096
 RIVER = [0,0,0,0]
@@ -349,9 +372,12 @@ while auth[3] == 1:
     auth[3] = (authreq(rio4, RIVER[3]))
 
 if auth == [0,0,0,0]:
-    getcannons()
+    FOCO = 0
     CANHOES = [['-','-','-','-','-','-','-','-'], ['-','-','-','-','-','-','-','-'], ['-','-','-','-','-','-','-','-'], ['-','-','-','-','-','-','-','-'], ['-','-','-','-','-','-','-','-']]
+    getcannons()
     display_canhoes()
+    _foco()
+
     turno = 0
 
     while turno < 273:
