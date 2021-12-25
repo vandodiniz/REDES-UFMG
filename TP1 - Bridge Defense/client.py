@@ -83,8 +83,6 @@ def state(rio, boat, lista_resposta):
                         boat[ponte-1].append(resposta['ships'][c])
                         ALL_BOATS.append(resposta['ships'][c])
                     ESTADO.append(resposta['type'])
-                else:
-                    print('TERMINOOOOOOOOOOOOOOOOOOOOOOU')
                 
                 if(turno == 272):
                     for II in range(0,8):
@@ -105,7 +103,7 @@ def shot(rio, adress, cannon, id):
     try:
         saida = rio.recv(bufferSize, 0)
         resposta = json.loads(saida.decode('utf-8'))
-        print(resposta)
+        #print(resposta)
         #ESTADO.append(resposta['type'])
     except:
         #print('Erro de transmissão')
@@ -185,6 +183,114 @@ def analisaRio(lista1, lista2):
         else:
             return 2
 
+def display_canhoes():
+    #canhoes:
+    print('CANHOES:')
+    for c in VALID_CANNONS[0]:
+        ponte = c[0]
+        fila = c[1]
+        CANHOES[fila][ponte-1] = 'C'
+    for fila in CANHOES:
+        for c in fila:
+            print(c.rjust(4), end='')
+        print('\n')
+    
+def display_navio():
+    P = 0
+    for ponte in BOATS_1:
+        vida = []
+        for barco in ponte:
+            if barco['hull'] == 'frigate':
+                vida.append(str(1 - barco['hits']))
+            if barco['hull'] == 'destroyer':
+                vida.append(str(2 - barco['hits']))
+            if barco['hull'] == 'battleship':
+                vida.append(str(3 - barco['hits']))
+        status = ''.join(vida)
+        BOATS_1D[P] = status
+        P+=1
+
+    P = 0
+    for ponte in BOATS_2:
+        vida = []
+        for barco in ponte:
+            if barco['hull'] == 'frigate':
+                vida.append(str(1 - barco['hits']))
+            if barco['hull'] == 'destroyer':
+                vida.append(str(2 - barco['hits']))
+            if barco['hull'] == 'battleship':
+                vida.append(str(3 - barco['hits']))
+        status = ''.join(vida)
+        BOATS_2D[P] = status
+        P+=1
+
+    P = 0
+    for ponte in BOATS_3:
+        vida = []
+        for barco in ponte:
+            if barco['hull'] == 'frigate':
+                vida.append(str(1 - barco['hits']))
+            if barco['hull'] == 'destroyer':
+                vida.append(str(2 - barco['hits']))
+            if barco['hull'] == 'battleship':
+                vida.append(str(3 - barco['hits']))
+        status = ''.join(vida)
+        BOATS_3D[P] = status
+        P+=1
+
+    P = 0
+    for ponte in BOATS_4:
+        vida = []
+        for barco in ponte:
+            if barco['hull'] == 'frigate':
+                vida.append(str(1 - barco['hits']))
+            if barco['hull'] == 'destroyer':
+                vida.append(str(2 - barco['hits']))
+            if barco['hull'] == 'battleship':
+                vida.append(str(3 - barco['hits']))
+        status = ''.join(vida)
+        BOATS_4D[P] = status
+        P+=1
+
+def display():
+
+    print ("\n") 
+
+    for c in CANHOES[0]:
+        print(c.rjust(4), end='')
+    print('\n')
+
+    for c in BOATS_1D:
+        print(c.ljust(4), end='')
+    print('\n')
+
+    for c in CANHOES[1]:
+        print(c.rjust(4), end='')
+    print('\n')
+
+    for c in BOATS_2D:
+        print(c.ljust(4), end='')
+    print('\n')
+
+    for c in CANHOES[2]:
+        print(c.rjust(4), end='')
+    print('\n')
+
+    for c in BOATS_3D:
+        print(c.ljust(4), end='')
+    print('\n')
+
+    for c in CANHOES[3]:
+        print(c.rjust(4), end='')
+    print('\n')
+
+    for c in BOATS_4D:
+        print(c.ljust(4), end='')
+    print('\n')
+
+    for c in CANHOES[4]:
+        print(c.rjust(4), end='')
+    print('\n')
 
 #DEFININDO AS ESPECIFICAÇÕES DO SERVIDOR E PEGANDO AS INFORMAÇÕES DO TECLADO
 bufferSize = 4096
@@ -244,6 +350,8 @@ while auth[3] == 1:
 
 if auth == [0,0,0,0]:
     getcannons()
+    CANHOES = [['-','-','-','-','-','-','-','-'], ['-','-','-','-','-','-','-','-'], ['-','-','-','-','-','-','-','-'], ['-','-','-','-','-','-','-','-'], ['-','-','-','-','-','-','-','-']]
+    display_canhoes()
     turno = 0
 
     while turno < 273:
@@ -256,6 +364,10 @@ if auth == [0,0,0,0]:
         BOATS_2 = [[],[],[],[],[],[],[],[]]
         BOATS_3 = [[],[],[],[],[],[],[],[]]
         BOATS_4 = [[],[],[],[],[],[],[],[]]
+        BOATS_1D = ['', '', '', '', '', '', '', '']
+        BOATS_2D = ['', '', '', '', '', '', '', '']
+        BOATS_3D = ['', '', '', '', '', '', '', '']
+        BOATS_4D = ['', '', '', '', '', '', '', '']
         error = [0,0,0,0]
         print(f'=============== TURNO {turno} ===============')
 
@@ -273,9 +385,9 @@ if auth == [0,0,0,0]:
             error[0] = state(rio1, BOATS_1, RESPOSTA_RIO1)
         
 
-        print('\nRIO 1:')
+        '''print('\nRIO 1:')
         for c in RESPOSTA_RIO1:
-            print(c)
+            print(c)'''
 
         error[1] = state(rio2, BOATS_2, RESPOSTA_RIO2)
         while error[1] == 1:
@@ -283,9 +395,9 @@ if auth == [0,0,0,0]:
             error[1] = state(rio2, BOATS_2, RESPOSTA_RIO2)
         
 
-        print('\nRIO 2:')
+        '''print('\nRIO 2:')
         for c in RESPOSTA_RIO2:
-            print(c)
+            print(c)'''
 
         error[2] = state(rio3, BOATS_3, RESPOSTA_RIO3)
         while error[2] == 1:
@@ -293,9 +405,9 @@ if auth == [0,0,0,0]:
             error[2] = state(rio3, BOATS_3, RESPOSTA_RIO3)
           
 
-        print('\nRIO 3:')
+        '''print('\nRIO 3:')
         for c in RESPOSTA_RIO3:
-            print(c)
+            print(c)'''
 
         error[3] = state(rio4, BOATS_4, RESPOSTA_RIO4)
         while  error[3] == 1:
@@ -304,9 +416,9 @@ if auth == [0,0,0,0]:
         
 
 
-        print('\nRIO 4:')
+        '''print('\nRIO 4:')
         for c in RESPOSTA_RIO4:
-            print(c)
+            print(c)'''
 
         '''print('NAVIOS DISPONIVEIS:', end=' ')
         print(ALL_BOATS)
@@ -315,6 +427,11 @@ if auth == [0,0,0,0]:
         print ('rio 3: ',BOATS_3)
         print ('rio 4: ',BOATS_4)'''
 
+        try:
+            display_navio()
+            display()
+        except:
+            print('erro ao mostrar display')
         try:
             for x in VALID_CANNONS[0]:  
                 tiro = True
@@ -381,7 +498,7 @@ if auth == [0,0,0,0]:
                         tiro = False
                     
                 if tiro == True:
-                    print('\nRESPOSTA TIRO:')
+                    #print('\nRESPOSTA TIRO:')
                     if r == 1:
                         shot(rio1, RIVER[0], x, identificador)
                     if r == 2:
@@ -393,15 +510,13 @@ if auth == [0,0,0,0]:
             
         except:
             print('erro ao atirar')
-            
+        
+        #input('')
         turno += 1
-        # input('proximo round')
-        if 'gameover' in ESTADO:
-            break
 
 else:
     print('FALHA NA AUTENTICAÇÃO')
 
 #print(f'ESTADO {ESTADO}')
-print('Gameover!')
+print(RESPOSTA_RIO1[0])
 quit()
