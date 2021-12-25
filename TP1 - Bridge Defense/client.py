@@ -297,6 +297,7 @@ if auth == [0,0,0,0]:
                     r = 1
                     if len(BOATS_1[p-1]) > 0:
                         identificador = weakest(BOATS_1[p-1])['id']
+                        refresh(identificador, BOATS_1[p-1])
                     else:
                         identificador = ALL_BOATS[0]['id']
 
@@ -304,9 +305,11 @@ if auth == [0,0,0,0]:
                     r = 1
                     if len(BOATS_1[p-1]) > 0:
                         identificador = weakest(BOATS_1[p-1])['id']
+                        refresh(identificador, BOATS_1[p-1])
                     elif len(BOATS_2[p-1]) > 0:
                         r = 2
                         identificador = weakest(BOATS_2[p-1])['id']
+                        refresh(identificador, BOATS_2[p-1])
                     else:
                         identificador = ALL_BOATS[0]['id']
                     
@@ -314,9 +317,11 @@ if auth == [0,0,0,0]:
                     r = 2
                     if len(BOATS_2[p-1]) > 0:
                         identificador = weakest(BOATS_2[p-1])['id']
+                        refresh(identificador, BOATS_2[p-1])
                     elif len(BOATS_3[p-1]) > 0:
                         r = 3
                         identificador = weakest(BOATS_3[p-1])['id']
+                        refresh(identificador, BOATS_3[p-1])
                     else:
                         identificador = ALL_BOATS[0]['id']
                     
@@ -324,9 +329,11 @@ if auth == [0,0,0,0]:
                     r = 3
                     if len(BOATS_3[p-1]) > 0:
                         identificador = weakest(BOATS_3[p-1])['id']
+                        refresh(identificador, BOATS_3[p-1])
                     elif len(BOATS_4[p-1]) > 0:
                         r = 4
                         identificador = weakest(BOATS_4[p-1])['id']
+                        refresh(identificador, BOATS_4[p-1])
                     else:
                         identificador = ALL_BOATS[0]['id']
                     
@@ -334,6 +341,7 @@ if auth == [0,0,0,0]:
                     r = 4
                     if len(BOATS_4[p-1]) > 0:
                         identificador = weakest(BOATS_4[p-1])['id']
+                        refresh(identificador, BOATS_4[p-1])
                     else:
                         identificador = ALL_BOATS[0]['id']
                     
