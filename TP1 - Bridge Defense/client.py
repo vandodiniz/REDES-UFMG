@@ -136,6 +136,29 @@ def weakest(_listaBarcos):
             betterBoat = i
     return betterBoat
 
+def refresh(id, lista):
+    for c in lista:
+        if c['id'] == id:
+            barco = c
+
+    barco['hits'] += 1
+
+    if barco['hull'] == 'frigate':
+        if barco['hits'] == 1:
+            lista.remove(barco)
+            ALL_BOATS.remove(barco)
+
+    elif barco['hull'] == 'destroyer':
+        if barco['hits'] == 2:
+            lista.remove(barco)
+            ALL_BOATS.remove(barco)
+            
+
+    elif barco['hull'] == 'battleship':
+        if barco['hits'] == 3:
+            lista.remove(barco)
+            ALL_BOATS.remove(barco)
+
 
 #DEFININDO AS ESPECIFICAÇÕES DO SERVIDOR E PEGANDO AS INFORMAÇÕES DO TECLADO
 bufferSize = 4096
