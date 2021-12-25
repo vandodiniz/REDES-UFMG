@@ -476,6 +476,7 @@ if auth == [0,0,0,0]:
                     escolha = analisaRio(BOATS_1, BOATS_2)
 
                     if escolha == 1:
+                        r = 1
                         identificador = weakest(BOATS_1[p-1])['id']
                         refresh(identificador, BOATS_1[p-1])
                     elif escolha == 2:
@@ -490,10 +491,11 @@ if auth == [0,0,0,0]:
                     escolha = analisaRio(BOATS_2, BOATS_3)
 
                     if escolha == 1:
+                        r = 2
                         identificador = weakest(BOATS_2[p-1])['id']
                         refresh(identificador, BOATS_2[p-1])
                     elif escolha == 2:
-                        r = 2
+                        r = 3
                         identificador = weakest(BOATS_3[p-1])['id']
                         refresh(identificador, BOATS_3[p-1])
                     else:
@@ -505,10 +507,11 @@ if auth == [0,0,0,0]:
                     escolha = analisaRio(BOATS_3, BOATS_4)
 
                     if escolha == 1:
+                        r = 3
                         identificador = weakest(BOATS_3[p-1])['id']
                         refresh(identificador, BOATS_3[p-1])
                     elif escolha == 2:
-                        r = 2
+                        r = 4
                         identificador = weakest(BOATS_4[p-1])['id']
                         refresh(identificador, BOATS_4[p-1])
                     else:
@@ -535,6 +538,7 @@ if auth == [0,0,0,0]:
                         shot(rio4, RIVER[3], x, identificador)
             
         except:
+            traceback.print_exc()
             print('erro ao atirar')
         
         #input('')
