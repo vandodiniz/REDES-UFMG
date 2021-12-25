@@ -159,6 +159,32 @@ def refresh(id, lista):
             lista.remove(barco)
             ALL_BOATS.remove(barco)
 
+def analisaRio(lista1, lista2):
+    vidas1 = vidas2 = 0
+    if len(lista1[p-1]) == len(lista2[p-1]) == 0:
+        return 0
+    else:
+        for barco in lista1[p-1]:
+            if barco['hull'] == 'frigate':
+                vidas1 += 1
+            if barco['hull'] == 'destroyer':
+                vidas1 += (2 - barco['hits'])
+            if barco['hull'] == 'battleship':
+                vidas1 += (3 - barco['hits'])
+        
+        for barco in lista2[p-1]:
+            if barco['hull'] == 'frigate':
+                vidas2 += 1
+            if barco['hull'] == 'destroyer':
+                vidas2 += (2 - barco['hits'])
+            if barco['hull'] == 'battleship':
+                vidas2 += (3 - barco['hits'])
+        
+        if vidas1 > vidas2:
+            return 1
+        else:
+            return 2
+
 
 #DEFININDO AS ESPECIFICAÇÕES DO SERVIDOR E PEGANDO AS INFORMAÇÕES DO TECLADO
 bufferSize = 4096
@@ -282,15 +308,16 @@ if auth == [0,0,0,0]:
         for c in RESPOSTA_RIO4:
             print(c)
 
-        print('NAVIOS DISPONIVEIS:', end=' ')
+        '''print('NAVIOS DISPONIVEIS:', end=' ')
         print(ALL_BOATS)
         print ('rio 1: ', BOATS_1)
         print ('rio 2: ',BOATS_2)
         print ('rio 3: ',BOATS_3)
-        print ('rio 4: ',BOATS_4)
+        print ('rio 4: ',BOATS_4)'''
 
         try:
-            for x in VALID_CANNONS[0]:  #[[5,2], [5,4], [4,5]]   [1,2,3,4,5,6,7,8] [0,1,2,3,4]
+            for x in VALID_CANNONS[0]:  
+                tiro = True
                 p = x[0]
                     
                 if x[1] == 0:
@@ -299,43 +326,51 @@ if auth == [0,0,0,0]:
                         identificador = weakest(BOATS_1[p-1])['id']
                         refresh(identificador, BOATS_1[p-1])
                     else:
-                        identificador = ALL_BOATS[0]['id']
+                        tiro = False
 
                 if x[1] == 1:
-                    r = 1
-                    if len(BOATS_1[p-1]) > 0:
+
+                    escolha = analisaRio(BOATS_1, BOATS_2)
+
+                    if escolha == 1:
                         identificador = weakest(BOATS_1[p-1])['id']
                         refresh(identificador, BOATS_1[p-1])
-                    elif len(BOATS_2[p-1]) > 0:
+                    elif escolha == 2:
                         r = 2
                         identificador = weakest(BOATS_2[p-1])['id']
                         refresh(identificador, BOATS_2[p-1])
                     else:
-                        identificador = ALL_BOATS[0]['id']
+                        tiro = False
                     
                 if x[1] == 2:
-                    r = 2
-                    if len(BOATS_2[p-1]) > 0:
+
+                    escolha = analisaRio(BOATS_2, BOATS_3)
+
+                    if escolha == 1:
                         identificador = weakest(BOATS_2[p-1])['id']
                         refresh(identificador, BOATS_2[p-1])
-                    elif len(BOATS_3[p-1]) > 0:
-                        r = 3
+                    elif escolha == 2:
+                        r = 2
                         identificador = weakest(BOATS_3[p-1])['id']
                         refresh(identificador, BOATS_3[p-1])
                     else:
-                        identificador = ALL_BOATS[0]['id']
+                        tiro = False
+                    
                     
                 if x[1] == 3:
-                    r = 3
-                    if len(BOATS_3[p-1]) > 0:
+
+                    escolha = analisaRio(BOATS_3, BOATS_4)
+
+                    if escolha == 1:
                         identificador = weakest(BOATS_3[p-1])['id']
                         refresh(identificador, BOATS_3[p-1])
-                    elif len(BOATS_4[p-1]) > 0:
-                        r = 4
+                    elif escolha == 2:
+                        r = 2
                         identificador = weakest(BOATS_4[p-1])['id']
                         refresh(identificador, BOATS_4[p-1])
                     else:
-                        identificador = ALL_BOATS[0]['id']
+                        tiro = False
+                    
                     
                 if x[1] == 4:
                     r = 4
@@ -343,17 +378,18 @@ if auth == [0,0,0,0]:
                         identificador = weakest(BOATS_4[p-1])['id']
                         refresh(identificador, BOATS_4[p-1])
                     else:
-                        identificador = ALL_BOATS[0]['id']
+                        tiro = False
                     
-        
-                if r == 1:
-                    shot(rio1, RIVER[0], x, identificador)
-                if r == 2:
-                    shot(rio2, RIVER[1], x, identificador)
-                if r == 3:
-                    shot(rio3, RIVER[2], x, identificador)
-                if r == 4:
-                    shot(rio4, RIVER[3], x, identificador)
+                if tiro == True:
+                    print('\nRESPOSTA TIRO:')
+                    if r == 1:
+                        shot(rio1, RIVER[0], x, identificador)
+                    if r == 2:
+                        shot(rio2, RIVER[1], x, identificador)
+                    if r == 3:
+                        shot(rio3, RIVER[2], x, identificador)
+                    if r == 4:
+                        shot(rio4, RIVER[3], x, identificador)
             
         except:
             print('erro ao atirar')
