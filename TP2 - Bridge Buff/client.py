@@ -6,29 +6,30 @@ def entrada():
         entrada = input('Digite sua entrada: ')
         dados = entrada.split(' ')
         try:
-            server = dados[0]
-            port = int(dados[1])
-            analyse = int(dados[2])
+            dados2 = dados.split(':')
+            server = dados2[0]
+            port = int(dados2[1])
+            analyse = int(dados[1])
             break
         except:
-            print('Entrada inválida! Tente no seguinte formato: "SERVER PORTA ANÁLISE"')
+            print('Entrada inválida! Tente no seguinte formato: "SERVER:PORTA ANÁLISE"')
 
     info =[server,port,analyse]
     return info
 
 #REQUISITA UM JOGO ESPECIFICO
-def Analisa_Jogo(type):
+def Analisa_Jogo(type, id):
      #ENVIO
-    entrada = json.dumps({"type": "getcannons", "auth": SAG}).encode('utf-8')
+    entrada = json.dumps({"id": id}).encode('utf-8')
     client.sendto(entrada, ADDR) 
 
     #RESPOSTA
     saida = client.recv(bufferSize, 0)
     resposta = json.loads(saida.decode('utf-8'))
     print(resposta)
-    if type == 'auth':
+    if type == 'sunk':
         SAGS.append = (resposta['auth'])
-    elif type == 'cannons':
+    elif type == 'escaped':
         CANNONS.append = (resposta['cannons'])
 
 # REQUISITA OS 100 MELHORES JOGOS DE UM TIPO
@@ -54,12 +55,10 @@ def Analisa_Conjunto(type):
 def myFunc(e):
         return e['OCORRENCIAS']
 
-def Immortals(game_ids):
+def Immortals():
     sags_ordenados = []
     sags_usados = []
-    for id in game_ids:
-        Analisa_Jogo(id)
-
+    
     for auth in SAGS:
         if auth not in sags_usados:
             aux = {}
@@ -95,10 +94,10 @@ CANNONS = []
 if COMANDO == 1:
     game_ids = Analisa_Conjunto('sunk')
     for id in game_ids:
-        Analisa_Jogo('sunk')
+        Analisa_Jogo('sunk', id)
     sags_ordenados = Immortals()
 
-if COMANDO == 2:
+elif COMANDO == 2:
     game_ids = Analisa_Conjunto('escaped')
     for id in game_ids:
         Analisa_Jogo('escaped')
