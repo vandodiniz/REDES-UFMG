@@ -28,7 +28,7 @@ def Analisa_Jogo(type, id):
     resposta = json.loads(saida.decode('utf-8'))
     print(resposta)
     if type == 'sunk':
-        SAGS.append = (resposta['auth'])
+        SAGS.append = (resposta['game_stats']['auth'])
     elif type == 'escaped':
         CANNONS.append = (resposta['cannons'])
 
@@ -52,7 +52,7 @@ def Analisa_Conjunto(type):
     return game_ids
 
 
-def myFunc(e):
+def ordena(e):
         return e['OCORRENCIAS']
 
 # ANALISE 1
@@ -68,13 +68,51 @@ def Immortals():
             sags_ordenados.append(aux)
             sags_usados.append(auth)
     
-    sags_ordenados.sort(key=myFunc, reverse=True)
-    print(sags_ordenados)
+    sags_ordenados.sort(key=ordena, reverse=True)
     return sags_ordenados
 
 # ANALISE 2
 def Top_Meta():
-    for game in CANNONS:
+    #transformando as disposições de canhoes em números:
+    metas = []
+    for cannons in CANNONS:
+        p1 = p2 = p3 = p4 = p5 = p6 = p7 = p8 = 0
+        for coordenada in cannons:
+            if coordenada[0] == 1:
+                p1 += 1
+            elif coordenada[0] == 2:
+                p2 += 1
+            elif coordenada[0] == 3:
+                p3 += 1
+            elif coordenada[0] == 4:
+                p4 += 1
+            elif coordenada[0] == 5:
+                p5 += 1
+            elif coordenada[0] == 6:
+                p6 += 1
+            elif coordenada[0] == 7:
+                p7 += 1
+            elif coordenada[0] == 8:
+                p8 += 1
+        lista_aux = [p1,p2,p3,p4,p5,p6,p7,p8]
+        string_ints = [str(int) for int in lista_aux]
+        numero = ''.join(string_ints)
+        metas.append(numero)
+    
+    #contando a ocorrencia de cada numero:
+    metas_ordenados = []
+    metas_usados = []
+    
+    for meta in metas:
+        if meta not in metas_usados:
+            aux = {}
+            aux['META'] = meta
+            aux['OCORRENCIAS'] = metas.count(meta)
+            metas_ordenados.append(aux)
+            metas_usados.append(meta)
+    
+    metas_ordenados.sort(key=ordena, reverse=True)
+    return metas_ordenados
         
 #DEFININDO AS ESPECIFICAÇÕES DO SERVIDOR E PEGANDO AS INFORMAÇÕES DO TECLADO
 bufferSize = 4096   
@@ -101,12 +139,17 @@ if COMANDO == 1:
     for id in game_ids:
         Analisa_Jogo('sunk', id)
     sags_ordenados = Immortals()
+    print(sags_ordenados)
 
 elif COMANDO == 2:
     game_ids = Analisa_Conjunto('escaped')
     for id in game_ids:
         Analisa_Jogo('escaped')
-    c_meta = Top_Meta()
+    metas_ordenados = Top_Meta()
+    print(metas_ordenados)
+
+client.close()
+
 
 
 

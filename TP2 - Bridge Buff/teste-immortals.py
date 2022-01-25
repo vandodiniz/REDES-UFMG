@@ -1,7 +1,7 @@
 sags_ordenados = []
 sags_usados = []
 
-def myFunc(e):
+def ordena(e):
         return e['OCORRENCIAS']
 
 SAGS = ['A','A','A', 'B','B','C', 'D','D','D','D']
@@ -14,5 +14,5 @@ for auth in SAGS:
         sags_ordenados.append(aux)
         sags_usados.append(auth)
     
-sags_ordenados.sort(key=myFunc, reverse=True)
+sags_ordenados.sort(key=ordena, reverse=True)
 print(sags_ordenados)
