@@ -71,6 +71,7 @@ def Immortals():
     print(sags_ordenados)
     return sags_ordenados
 
+#
 #DEFININDO AS ESPECIFICAÇÕES DO SERVIDOR E PEGANDO AS INFORMAÇÕES DO TECLADO
 bufferSize = 4096   
 dados = entrada()
