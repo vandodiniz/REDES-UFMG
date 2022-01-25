@@ -51,10 +51,11 @@ def Analisa_Conjunto(type):
     game_ids = (resposta['game_ids'])
     return game_ids
 
-# ANALISE 1 
+
 def myFunc(e):
         return e['OCORRENCIAS']
 
+# ANALISE 1
 def Immortals():
     sags_ordenados = []
     sags_usados = []
@@ -71,7 +72,10 @@ def Immortals():
     print(sags_ordenados)
     return sags_ordenados
 
-#
+# ANALISE 2
+def Top_Meta():
+    for game in CANNONS:
+        
 #DEFININDO AS ESPECIFICAÇÕES DO SERVIDOR E PEGANDO AS INFORMAÇÕES DO TECLADO
 bufferSize = 4096   
 dados = entrada()
@@ -102,7 +106,7 @@ elif COMANDO == 2:
     game_ids = Analisa_Conjunto('escaped')
     for id in game_ids:
         Analisa_Jogo('escaped')
-    #sags_ordenados = Immortals()
+    c_meta = Top_Meta()
 
 
 
