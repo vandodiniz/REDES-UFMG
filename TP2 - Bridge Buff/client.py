@@ -19,36 +19,53 @@ def entrada():
 
 #REQUISITA UM JOGO ESPECIFICO
 def Analisa_Jogo(type, id):
-     #ENVIO
-    entrada = json.dumps({"id": id}).encode('utf-8')
-    client.sendto(entrada, ADDR) 
+    #ENVIO
+    entrada = f"GET /api/game/{id} HTTP/1.1\r\nHost: 'http://152.67.55.32:8080/swagger'\r\n\r\n".encode('utf-8')
+    client.send(entrada)  
 
     #RESPOSTA
-    saida = client.recv(bufferSize, 0)
-    resposta = json.loads(saida.decode('utf-8'))
+
+    saida = client.recv(4096, 0)
+    resposta = (saida.decode("utf-8"))
+    
+    cont = 0
+    for letra in resposta:
+        if letra == '{':
+            resposta = resposta[cont:]
+            break
+        else:
+            cont+=1
+
+    input()    
     print(resposta)
+    resposta = json.loads(resposta)
+    print(resposta)
+   
     if type == 'sunk':
-        SAGS.append = (resposta['game_stats']['auth'])
+        SAGS.append(resposta['game_stats']['auth'])
     elif type == 'escaped':
-        CANNONS.append = (resposta['cannons'])
+        CANNONS.append(resposta['cannons'])
 
 # REQUISITA OS 100 MELHORES JOGOS DE UM TIPO
 def Analisa_Conjunto(type): 
 
     #ENVIO
     if type == 'sunk':
-        entrada = json.dumps({ "ranking": "sunk", "start": 1, "end": 100}).encode('utf-8')
+        entrada = f"GET /api/rank/sunk?start=1&end=100 HTTP/1.1\r\nHost: 'http://152.67.55.32:8080/swagger'\r\n\r\n".encode('utf-8')
     elif type == 'escaped':
-        entrada = json.dumps({ "ranking": "escaped", "start": 1, "end": 100}).encode('utf-8')
+        entrada = f"GET /api/rank/escaped?start=1&end=100 HTTP/1.1\r\nHost: 'http://152.67.55.32:8080/swagger'\r\n\r\n".encode('utf-8')
 
-    client.sendto(entrada, ADDR) 
-
+    client.send(entrada) 
+    print('enviou')
     #RESPOSTA
    
-    saida = client.recv(bufferSize, 0)
-    resposta = json.loads(saida.decode('utf-8'))
+    saida = client.recv(4096, 0)
+    print('recebeu')
+    resposta = (saida.decode("utf-8"))
     print(resposta)
+    input('teste')
     game_ids = (resposta['game_ids'])
+    print('vai retornar isso: ', game_ids)
     return game_ids
 
 
@@ -115,18 +132,13 @@ def Top_Meta():
     return metas_ordenados
         
 #DEFININDO AS ESPECIFICAÇÕES DO SERVIDOR E PEGANDO AS INFORMAÇÕES DO TECLADO
-bufferSize = 4096   
-dados = entrada()
-
-SERVER = dados[0]
-PORT = int(dados[1])
-COMANDO = dados[2]
-ADDR = (SERVER, PORT)
+COMANDO = int(input('Comando: '))
 
 #CONECTANDO COM O SERVIDOR
 client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+client.settimeout(0.5)
 try:
-    client.connect(ADDR)
+    client.connect(('152.67.55.32', 8080))  
 except:
     print('Erro a conectar com o servidor!')
     quit()
@@ -134,8 +146,11 @@ except:
 SAGS = []
 CANNONS = []
 
+Analisa_Jogo('sunk', 1)
 if COMANDO == 1:
+    print('entrou')
     game_ids = Analisa_Conjunto('sunk')
+    print('passou')
     for id in game_ids:
         Analisa_Jogo('sunk', id)
     sags_ordenados = Immortals()
