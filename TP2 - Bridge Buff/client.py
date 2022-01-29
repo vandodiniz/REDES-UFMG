@@ -19,7 +19,6 @@ def Analisa_Jogo(type, id):
             break
         saida = buf
     resposta = (saida.decode("utf-8"))
-    print(resposta)
     
     #MANIPULANDO A RESPOSTA
     cont = 0
@@ -30,9 +29,6 @@ def Analisa_Jogo(type, id):
         else:
             cont+=1
 
-    print('resposta tratada: ')
-    print(resposta)
-    print('-'*100)
     resposta = json.loads(resposta)
    
     #SALVANDO AS INFORMAÇÕES UTEIS
@@ -58,7 +54,6 @@ def Analisa_Conjunto(type):
             break
         saida = buf
         resposta = (saida.decode("utf-8"))
-    print(resposta)
 
     #MANIPULANDO A RESPOSTA
     cont = 0
@@ -158,30 +153,32 @@ except:
     print('Erro a conectar com o servidor!')
     quit()
 
-Analisa_Conjunto('sunk')
-
 #ANALISES
-# if COMANDO == 1:
-#     game_ids = Analisa_Conjunto('sunk')
-#     for id in game_ids:
-#         Analisa_Jogo('sunk', id)
-#     sags_ordenados = Immortals()
+if COMANDO == 1:
+    game_ids = Analisa_Conjunto('sunk')
+    for id in game_ids:
+        client.close()
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+        client.connect((IP, PORT))
+        Analisa_Jogo('sunk', id)
+        
+    sags_ordenados = Immortals()
 
-#     cont = 1
-#     for ranking in sags_ordenados:
-#         print(f'{cont}. {ranking}')
-#         cont+=1
+    cont = 1
+    for ranking in sags_ordenados:
+        print(f'{cont}. {ranking}')
+        cont+=1
     
 
-# elif COMANDO == 2:
-#     game_ids = Analisa_Conjunto('escaped')
-#     for id in game_ids:
-#         Analisa_Jogo('escaped', id)
-#     metas_ordenados = Top_Meta()
+elif COMANDO == 2:
+    game_ids = Analisa_Conjunto('escaped')
+    for id in game_ids:
+        Analisa_Jogo('escaped', id)
+    metas_ordenados = Top_Meta()
 
-#     cont = 1
-#     for ranking in metas_ordenados:
-#         print(f'{cont}. {ranking}')
-#         cont+=1
+    cont = 1
+    for ranking in metas_ordenados:
+        print(f'{cont}. {ranking}')
+        cont+=1
 
 client.close()
