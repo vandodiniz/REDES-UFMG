@@ -9,12 +9,13 @@ client.connect(('152.67.55.32', 8080))
 #REQUISITA UM JOGO ESPECIFICO
 def Analisa_Jogo(type, id):
     #ENVIO
-    entrada = f"GET /api/game/{id} HTTP/1.1\r\nHost: '{url}'\r\n\r\n".encode('utf-8')
+    entrada = f"GET /api/game/{id} HTTP/1.1\r\nHost: {url}\r\n\r\n".encode('utf-8')
     client.send(entrada)  
 
     #RESPOSTA
     saida = client.recv(4096, 0)
     resposta = (saida.decode("utf-8"))
+    print(resposta)
     
     #MANIPULANDO A RESPOSTA
     cont = 0
@@ -37,9 +38,9 @@ def Analisa_Conjunto(type):
 
     #ENVIO
     if type == 'sunk':
-        entrada = f"GET /api/rank/sunk?start=1&end=100 HTTP/1.1\r\nHost: '{url}'\r\n\r\n".encode('utf-8')
+        entrada = f"GET /api/rank/sunk?start=1&end=100 HTTP/1.1\r\nHost: {url}\r\n\r\n".encode('utf-8')
     elif type == 'escaped':
-        entrada = f"GET /api/rank/escaped?start=1&end=100 HTTP/1.1\r\nHost: '{url}'\r\n\r\n".encode('utf-8')
+        entrada = f"GET /api/rank/escaped?start=1&end=100 HTTP/1.1\r\nHost: {url}\r\n\r\n".encode('utf-8')
 
     client.send(entrada) 
     #RESPOSTA
@@ -144,28 +145,30 @@ except:
     print('Erro a conectar com o servidor!')
     quit()
 
-#ANALISES
-if COMANDO == 1:
-    game_ids = Analisa_Conjunto('sunk')
-    for id in game_ids:
-        Analisa_Jogo('sunk', id)
-    sags_ordenados = Immortals()
+Analisa_Jogo('sunk', 1)
 
-    cont = 1
-    for ranking in sags_ordenados:
-        print(f'{cont}. {ranking}')
-        cont+=1
+# #ANALISES
+# if COMANDO == 1:
+#     game_ids = Analisa_Conjunto('sunk')
+#     for id in game_ids:
+#         Analisa_Jogo('sunk', id)
+#     sags_ordenados = Immortals()
+
+#     cont = 1
+#     for ranking in sags_ordenados:
+#         print(f'{cont}. {ranking}')
+#         cont+=1
     
 
-elif COMANDO == 2:
-    game_ids = Analisa_Conjunto('escaped')
-    for id in game_ids:
-        Analisa_Jogo('escaped', id)
-    metas_ordenados = Top_Meta()
+# elif COMANDO == 2:
+#     game_ids = Analisa_Conjunto('escaped')
+#     for id in game_ids:
+#         Analisa_Jogo('escaped', id)
+#     metas_ordenados = Top_Meta()
 
-    cont = 1
-    for ranking in metas_ordenados:
-        print(f'{cont}. {ranking}')
-        cont+=1
+#     cont = 1
+#     for ranking in metas_ordenados:
+#         print(f'{cont}. {ranking}')
+#         cont+=1
 
-client.close()
+# client.close()
