@@ -30,7 +30,7 @@ def Analisa_Jogo(type, id):
     if type == 'sunk':
         SAGS.append(resposta['game_stats']['auth'])
     elif type == 'escaped':
-        CANNONS.append(resposta['cannons'])
+        CANNONS.append(resposta['game_stats']['cannons'])
     
 # REQUISITA OS 100 MELHORES JOGOS DE UM TIPO
 def Analisa_Conjunto(type): 
@@ -158,9 +158,9 @@ if COMANDO == 1:
     
 
 elif COMANDO == 2:
-    game_ids = Analisa_Conjunto('sunk')
+    game_ids = Analisa_Conjunto('escaped')
     for id in game_ids:
-        Analisa_Jogo('sunk', id)
+        Analisa_Jogo('escaped', id)
     metas_ordenados = Top_Meta()
 
     cont = 1
