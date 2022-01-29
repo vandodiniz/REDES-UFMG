@@ -18,18 +18,8 @@ def Analisa_Jogo(type, id):
         if not buf:
             break
         saida = buf
-    resposta = (saida.decode("utf-8"))
-    
-    #MANIPULANDO A RESPOSTA
-    cont = 0
-    for letra in resposta:
-        if letra == '{':
-            resposta = resposta[cont:]
-            break
-        else:
-            cont+=1
-
-    resposta = json.loads(resposta)
+    resposta = json.loads(saida.decode("utf-8"))
+    #print(resposta)
    
     #SALVANDO AS INFORMAÇÕES UTEIS
     if type == 'sunk':
@@ -53,17 +43,8 @@ def Analisa_Conjunto(type):
         if not buf:
             break
         saida = buf
-        resposta = (saida.decode("utf-8"))
-
-    #MANIPULANDO A RESPOSTA
-    cont = 0
-    for letra in resposta:
-        if letra == '{':
-            resposta = resposta[cont:]
-            break
-        else:
-            cont+=1
-    resposta = json.loads(resposta)
+    resposta = json.loads(saida.decode("utf-8"))
+    #print(resposta)
 
     #SALVANDO AS INFORMAÇÕES UTEIS
     game_ids = (resposta['game_ids'])
@@ -173,6 +154,9 @@ if COMANDO == 1:
 elif COMANDO == 2:
     game_ids = Analisa_Conjunto('escaped')
     for id in game_ids:
+        client.close()
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+        client.connect((IP, PORT))
         Analisa_Jogo('escaped', id)
     metas_ordenados = Top_Meta()
 
