@@ -9,11 +9,15 @@ client.connect(('152.67.55.32', 8080))
 #REQUISITA UM JOGO ESPECIFICO
 def Analisa_Jogo(type, id):
     #ENVIO
-    entrada = f"GET /api/game/{id} HTTP/1.1\r\nHost: {url}\r\n\r\n".encode('utf-8')
+    entrada = f"GET /api/game/{id} HTTP/1.1\r\nHost: {IP}\r\n\r\n".encode('utf-8')
     client.send(entrada)  
 
     #RESPOSTA
-    saida = client.recv(4096, 0)
+    while True:
+        buf = client.recv(4096)
+        if not buf:
+            break
+        saida = buf
     resposta = (saida.decode("utf-8"))
     print(resposta)
     
@@ -25,6 +29,10 @@ def Analisa_Jogo(type, id):
             break
         else:
             cont+=1
+
+    print('resposta tratada: ')
+    print(resposta)
+    print('-'*100)
     resposta = json.loads(resposta)
    
     #SALVANDO AS INFORMAÇÕES UTEIS
@@ -44,8 +52,13 @@ def Analisa_Conjunto(type):
 
     client.send(entrada) 
     #RESPOSTA
-    saida = client.recv(4096, 0)
-    resposta = (saida.decode("utf-8"))
+    while True:
+        buf = client.recv(4096)
+        if not buf:
+            break
+        saida = buf
+        resposta = (saida.decode("utf-8"))
+    print(resposta)
 
     #MANIPULANDO A RESPOSTA
     cont = 0
@@ -145,9 +158,9 @@ except:
     print('Erro a conectar com o servidor!')
     quit()
 
-Analisa_Jogo('sunk', 1)
+Analisa_Conjunto('sunk')
 
-# #ANALISES
+#ANALISES
 # if COMANDO == 1:
 #     game_ids = Analisa_Conjunto('sunk')
 #     for id in game_ids:
@@ -171,4 +184,4 @@ Analisa_Jogo('sunk', 1)
 #         print(f'{cont}. {ranking}')
 #         cont+=1
 
-# client.close()
+client.close()
