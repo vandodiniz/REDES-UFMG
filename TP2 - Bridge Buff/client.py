@@ -1,6 +1,7 @@
 import socket
 import json
 import sys
+import time
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  
 
@@ -18,15 +19,18 @@ def Analisa_Jogo(type, id):
         if not buf:
             break
         saida = buf
-    resposta = json.loads(saida.decode("utf-8"))
+    saida = saida.decode('utf-8')
+    csv_ranking = open('resposta.csv', 'w')
+    csv_ranking.write(saida)
+    resposta = json.loads(saida)
     #print(resposta)
    
     #SALVANDO AS INFORMAÇÕES UTEIS
     if type == 'sunk':
         SAGS.append(resposta['game_stats']['auth'])
+        SUNK.append(resposta['game_stats']['score']['sunk_ships'])
     elif type == 'escaped':
         CANNONS.append(resposta['game_stats']['cannons'])
-    
 # REQUISITA OS 100 MELHORES JOGOS DE UM TIPO
 def Analisa_Conjunto(type): 
 
@@ -59,6 +63,7 @@ def Immortals():
     sags_ordenados = []
     sags_usados = []
     
+    # calculando quantas ocorrencias cada SAG teve
     for auth in SAGS:
         if auth not in sags_usados:
             aux = {}
@@ -66,8 +71,22 @@ def Immortals():
             aux['OCORRENCIAS'] = SAGS.count(auth)
             sags_ordenados.append(aux)
             sags_usados.append(auth)
-    
+
     sags_ordenados.sort(key=ordena, reverse=True)
+    
+    # lista auxiliar para calcular a media
+    for c in range(0,100):
+        STATS.append({"SAG": SAGS[c], "SUNK": SUNK[c]})
+
+    # adicionando a media de cada SAG
+    for elemento in sags_ordenados:
+        soma = 0
+        for c in STATS:
+            if elemento['SAG'] == c['SAG']:
+                soma += c['SUNK']
+        media = soma/elemento['OCORRENCIAS']
+        elemento['MEDIA'] = media
+
     return sags_ordenados
 
 # ANALISE 2
@@ -111,7 +130,7 @@ def Top_Meta():
             metas_usados.append(meta)
     
     metas_ordenados.sort(key=ordena, reverse=True)
-    return metas_ordenados
+    return metas_ordenados  
 
 
 #DEFININDO AS ESPECIFICAÇÕES DO SERVIDOR E PEGANDO AS INFORMAÇÕES DO TECLADO
@@ -126,6 +145,9 @@ client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 SAGS = []
 CANNONS = []
+SUNK = []
+STATS = []
+MEDIA = []
 
 #CONECTANDO COM O SERVIDOR
 try:
@@ -145,10 +167,9 @@ if COMANDO == 1:
         
     sags_ordenados = Immortals()
 
-    cont = 1
+    csv_ranking = open('ranking_sags.csv', 'w')
     for ranking in sags_ordenados:
-        print(f'{cont}. {ranking}')
-        cont+=1
+        print(f'{ranking["SAG"]}, {ranking["OCORRENCIAS"]},  {ranking["MEDIA"]}  \n')
     
 
 elif COMANDO == 2:
@@ -160,9 +181,12 @@ elif COMANDO == 2:
         Analisa_Jogo('escaped', id)
     metas_ordenados = Top_Meta()
 
-    cont = 1
+    cont = 0
+    csv_ranking = open('ranking_meta.csv', 'w')
     for ranking in metas_ordenados:
         print(f'{cont}. {ranking}')
-        cont+=1
+        #csv_ranking.write(f'{cont}. {ranking}\n')
+        cont +=1
 
+csv_ranking.close()
 client.close()
