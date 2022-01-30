@@ -18,9 +18,9 @@ def Analisa_Jogo(type, id):
         if not buf:
             break
         saida = buf
-    resposta = (saida.decode("utf-8"))
+    resposta = saida.decode('utf-8')
     
-    #MANIPULANDO A RESPOSTA
+    #TRATANDO A REPOSTA CASO NECESSARIO
     cont = 0
     for letra in resposta:
         if letra == '{':
@@ -30,13 +30,15 @@ def Analisa_Jogo(type, id):
             cont+=1
 
     resposta = json.loads(resposta)
-   
+
     #SALVANDO AS INFORMAÇÕES UTEIS
     if type == 'sunk':
         SAGS.append(resposta['game_stats']['auth'])
+        SUNK.append(resposta['game_stats']['score']['sunk_ships'])
     elif type == 'escaped':
         CANNONS.append(resposta['game_stats']['cannons'])
-    
+        ESCAPED.append(resposta['game_stats']['score']['escaped_ships'])
+
 # REQUISITA OS 100 MELHORES JOGOS DE UM TIPO
 def Analisa_Conjunto(type): 
 
@@ -53,17 +55,8 @@ def Analisa_Conjunto(type):
         if not buf:
             break
         saida = buf
-        resposta = (saida.decode("utf-8"))
-
-    #MANIPULANDO A RESPOSTA
-    cont = 0
-    for letra in resposta:
-        if letra == '{':
-            resposta = resposta[cont:]
-            break
-        else:
-            cont+=1
-    resposta = json.loads(resposta)
+    resposta = json.loads(saida.decode("utf-8"))
+    #print(resposta)
 
     #SALVANDO AS INFORMAÇÕES UTEIS
     game_ids = (resposta['game_ids'])
@@ -78,6 +71,7 @@ def Immortals():
     sags_ordenados = []
     sags_usados = []
     
+    # calculando quantas ocorrencias cada SAG teve
     for auth in SAGS:
         if auth not in sags_usados:
             aux = {}
@@ -85,8 +79,22 @@ def Immortals():
             aux['OCORRENCIAS'] = SAGS.count(auth)
             sags_ordenados.append(aux)
             sags_usados.append(auth)
-    
+
     sags_ordenados.sort(key=ordena, reverse=True)
+    
+    # lista auxiliar para calcular a media
+    for c in range(0,100):
+        STATS.append({"SAG": SAGS[c], "SUNK": SUNK[c]})
+
+    # adicionando a media de cada SAG
+    for elemento in sags_ordenados:
+        soma = 0
+        for c in STATS:
+            if elemento['SAG'] == c['SAG']:
+                soma += c['SUNK']
+        media = soma/elemento['OCORRENCIAS']
+        elemento['MEDIA'] = media
+
     return sags_ordenados
 
 # ANALISE 2
@@ -116,8 +124,8 @@ def Top_Meta():
         string_ints = [str(int) for int in lista_aux]
         numero = ''.join(string_ints)
         metas.append(numero)
-    
-    #contando a ocorrencia de cada numero:
+
+    #contando a ocorrencia de cada meta:
     metas_ordenados = []
     metas_usados = []
     
@@ -130,7 +138,21 @@ def Top_Meta():
             metas_usados.append(meta)
     
     metas_ordenados.sort(key=ordena, reverse=True)
-    return metas_ordenados
+    
+    # lista auxiliar para calcular a media
+    for c in range(0,100):
+        STATS.append({"META": metas[c], "ESCAPED": ESCAPED[c]})
+
+    # adicionando a media de cada SAG
+    for elemento in metas_ordenados:
+        soma = 0
+        for c in STATS:
+            if elemento['META'] == c['META']:
+                soma += c['ESCAPED']
+        media = soma/elemento['OCORRENCIAS']
+        elemento['MEDIA'] = media
+
+    return metas_ordenados  
 
 
 #DEFININDO AS ESPECIFICAÇÕES DO SERVIDOR E PEGANDO AS INFORMAÇÕES DO TECLADO
@@ -145,6 +167,9 @@ client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 SAGS = []
 CANNONS = []
+SUNK = []
+ESCAPED = []
+STATS = []
 
 #CONECTANDO COM O SERVIDOR
 try:
@@ -163,22 +188,20 @@ if COMANDO == 1:
         Analisa_Jogo('sunk', id)
         
     sags_ordenados = Immortals()
-
-    cont = 1
     for ranking in sags_ordenados:
-        print(f'{cont}. {ranking}')
-        cont+=1
+        print(f'{ranking["SAG"]}, {ranking["OCORRENCIAS"]},  {ranking["MEDIA"]}  \n')
     
 
 elif COMANDO == 2:
     game_ids = Analisa_Conjunto('escaped')
     for id in game_ids:
+        client.close()
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+        client.connect((IP, PORT))
         Analisa_Jogo('escaped', id)
-    metas_ordenados = Top_Meta()
 
-    cont = 1
+    metas_ordenados = Top_Meta()
     for ranking in metas_ordenados:
-        print(f'{cont}. {ranking}')
-        cont+=1
+        print(f'{ranking["META"]},  {ranking["MEDIA"]}  \n')
 
 client.close()

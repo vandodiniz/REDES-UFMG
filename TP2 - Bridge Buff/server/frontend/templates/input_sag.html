@@ -1,0 +1,12 @@
+{% extends "template.html" %}
+{% block conteudo %}
+      <form action="criar" method="post">
+        <fieldset>
+          <div class="form-group">
+            <label for="nome">Digite o identificador do Jogo desejado</label>
+            <input type="text" id="nome" name="nome" class="form-control">
+          </div>
+          <button type="submit" class="btn btn-primary btn-salvar">Buscar</button>
+        </fieldset>
+      </form>
+{% endblock %}
