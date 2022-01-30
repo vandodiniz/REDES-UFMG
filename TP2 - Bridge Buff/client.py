@@ -19,18 +19,27 @@ def Analisa_Jogo(type, id):
         if not buf:
             break
         saida = buf
-    saida = saida.decode('utf-8')
-    csv_ranking = open('resposta.csv', 'w')
-    csv_ranking.write(saida)
-    resposta = json.loads(saida)
-    #print(resposta)
-   
+    resposta = saida.decode('utf-8')
+    
+    #TRATANDO A REPOSTA CASO NECESSARIO
+    cont = 0
+    for letra in resposta:
+        if letra == '{':
+            resposta = resposta[cont:]
+            break
+        else:
+            cont+=1
+
+    resposta = json.loads(resposta)
+
     #SALVANDO AS INFORMAÇÕES UTEIS
     if type == 'sunk':
         SAGS.append(resposta['game_stats']['auth'])
         SUNK.append(resposta['game_stats']['score']['sunk_ships'])
     elif type == 'escaped':
         CANNONS.append(resposta['game_stats']['cannons'])
+        ESCAPED.append(resposta['game_stats']['score']['escaped_ships'])
+
 # REQUISITA OS 100 MELHORES JOGOS DE UM TIPO
 def Analisa_Conjunto(type): 
 
@@ -116,7 +125,7 @@ def Top_Meta():
         string_ints = [str(int) for int in lista_aux]
         numero = ''.join(string_ints)
         metas.append(numero)
-    
+
     #contando a ocorrencia de cada numero:
     metas_ordenados = []
     metas_usados = []
@@ -146,8 +155,8 @@ client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 SAGS = []
 CANNONS = []
 SUNK = []
+ESCAPED = []
 STATS = []
-MEDIA = []
 
 #CONECTANDO COM O SERVIDOR
 try:
