@@ -2,10 +2,6 @@ import socket
 import json
 import sys
 
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  
-
-client.connect(('152.67.55.32', 8080))  
-
 #REQUISITA UM JOGO ESPECIFICO
 def Analisa_Jogo(type, id):
     #ENVIO
