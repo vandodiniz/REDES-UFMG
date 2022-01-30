@@ -1,7 +1,6 @@
 import socket
 import json
 import sys
-import time
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  
 
@@ -126,7 +125,7 @@ def Top_Meta():
         numero = ''.join(string_ints)
         metas.append(numero)
 
-    #contando a ocorrencia de cada numero:
+    #contando a ocorrencia de cada meta:
     metas_ordenados = []
     metas_usados = []
     
@@ -139,6 +138,20 @@ def Top_Meta():
             metas_usados.append(meta)
     
     metas_ordenados.sort(key=ordena, reverse=True)
+    
+    # lista auxiliar para calcular a media
+    for c in range(0,100):
+        STATS.append({"META": metas[c], "ESCAPED": ESCAPED[c]})
+
+    # adicionando a media de cada SAG
+    for elemento in metas_ordenados:
+        soma = 0
+        for c in STATS:
+            if elemento['META'] == c['META']:
+                soma += c['ESCAPED']
+        media = soma/elemento['OCORRENCIAS']
+        elemento['MEDIA'] = media
+
     return metas_ordenados  
 
 
@@ -175,8 +188,6 @@ if COMANDO == 1:
         Analisa_Jogo('sunk', id)
         
     sags_ordenados = Immortals()
-
-    csv_ranking = open('ranking_sags.csv', 'w')
     for ranking in sags_ordenados:
         print(f'{ranking["SAG"]}, {ranking["OCORRENCIAS"]},  {ranking["MEDIA"]}  \n')
     
@@ -188,14 +199,9 @@ elif COMANDO == 2:
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
         client.connect((IP, PORT))
         Analisa_Jogo('escaped', id)
+
     metas_ordenados = Top_Meta()
-
-    cont = 0
-    csv_ranking = open('ranking_meta.csv', 'w')
     for ranking in metas_ordenados:
-        print(f'{cont}. {ranking}')
-        #csv_ranking.write(f'{cont}. {ranking}\n')
-        cont +=1
+        print(f'{ranking["META"]},  {ranking["MEDIA"]}  \n')
 
-csv_ranking.close()
 client.close()
