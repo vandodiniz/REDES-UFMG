@@ -2,14 +2,10 @@ import socket
 import json
 import sys
 
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  
-
-client.connect(('152.67.55.32', 8080))  
-
 #REQUISITA UM JOGO ESPECIFICO
 def Analisa_Jogo(type, id):
     #ENVIO
-    entrada = f"GET /api/game/{id} HTTP/1.1\r\nHost: {IP}\r\n\r\n".encode('utf-8')
+    entrada = f"GET /api/game/{id} HTTP/1.1\r\nHost: {url}\r\n\r\n".encode('utf-8')
     client.send(entrada)  
 
     #RESPOSTA
