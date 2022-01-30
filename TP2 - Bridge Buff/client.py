@@ -45,16 +45,27 @@ def Analisa_Conjunto(type):
         entrada = f"GET /api/rank/escaped?start=1&end=100 HTTP/1.1\r\nHost: {url}\r\n\r\n".encode('utf-8')
 
     client.send(entrada) 
-    #RESPOSTA
+
+    #RESPOSTA:
     while True:
         buf = client.recv(4096)
         if not buf:
             break
         saida = buf
-    resposta = json.loads(saida.decode("utf-8"))
-    #print(resposta)
+    resposta = saida.decode('utf-8')
+    
+    #TRATANDO A REPOSTA CASO NECESSARIO:
+    cont = 0
+    for letra in resposta:
+        if letra == '{':
+            resposta = resposta[cont:]
+            break
+        else:
+            cont+=1
 
-    #SALVANDO AS INFORMAÇÕES UTEIS
+    resposta = json.loads(resposta)
+
+    #SALVANDO AS INFORMAÇÕES UTEIS:
     game_ids = (resposta['game_ids'])
     return game_ids
 
@@ -98,28 +109,27 @@ def Top_Meta():
     #transformando as disposições de canhoes em números:
     metas = []
     for cannons in CANNONS:
-        p1 = p2 = p3 = p4 = p5 = p6 = p7 = p8 = 0
+        c1 = c2 = c3 = c4 = c5 = 0
         for coordenada in cannons:
-            if coordenada[0] == 1:
-                p1 += 1
+            if coordenada[1] == 0:
+                c1 += 1
+            elif coordenada[0] == 1:
+                c2 += 1
             elif coordenada[0] == 2:
-                p2 += 1
+                c3 += 1
             elif coordenada[0] == 3:
-                p3 += 1
+                c4 += 1
             elif coordenada[0] == 4:
-                p4 += 1
-            elif coordenada[0] == 5:
-                p5 += 1
-            elif coordenada[0] == 6:
-                p6 += 1
-            elif coordenada[0] == 7:
-                p7 += 1
-            elif coordenada[0] == 8:
-                p8 += 1
-        lista_aux = [p1,p2,p3,p4,p5,p6,p7,p8]
-        string_ints = [str(int) for int in lista_aux]
-        numero = ''.join(string_ints)
-        metas.append(numero)
+                c5 += 1
+
+        carreiras = [c1,c2,c3,c4,c5]
+        meta = []
+        for c in range (0,9):
+            numero = carreiras.count(c)
+            meta.append(numero)
+        meta = [str(int) for int in meta]
+        meta = ''.join(meta)
+        metas.append(meta)
 
     #contando a ocorrencia de cada meta:
     metas_ordenados = []
@@ -149,7 +159,7 @@ def Top_Meta():
         elemento['MEDIA'] = media
 
     return metas_ordenados  
-
+    
 
 #DEFININDO AS ESPECIFICAÇÕES DO SERVIDOR E PEGANDO AS INFORMAÇÕES DO TECLADO
 dados = sys.argv
