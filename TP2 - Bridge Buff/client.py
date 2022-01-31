@@ -72,6 +72,9 @@ def Analisa_Conjunto(type):
 
 def ordena(e):
         return e['OCORRENCIAS']
+
+def ordena2(e):
+        return e['MEDIA']
     
 # ANALISE 1
 def Immortals():
@@ -113,19 +116,19 @@ def Top_Meta():
         for coordenada in cannons:
             if coordenada[1] == 0:
                 c1 += 1
-            elif coordenada[0] == 1:
+            elif coordenada[1] == 1:
                 c2 += 1
-            elif coordenada[0] == 2:
+            elif coordenada[1] == 2:
                 c3 += 1
-            elif coordenada[0] == 3:
+            elif coordenada[1] == 3:
                 c4 += 1
-            elif coordenada[0] == 4:
+            elif coordenada[1] == 4:
                 c5 += 1
 
         carreiras = [c1,c2,c3,c4,c5]
         meta = []
-        for c in range (0,9):
-            numero = carreiras.count(c)
+        for c in range (0,8):
+            numero = carreiras.count(c+1)
             meta.append(numero)
         meta = [str(int) for int in meta]
         meta = ''.join(meta)
@@ -143,8 +146,6 @@ def Top_Meta():
             metas_ordenados.append(aux)
             metas_usados.append(meta)
     
-    metas_ordenados.sort(key=ordena, reverse=True)
-    
     # lista auxiliar para calcular a media
     for c in range(0,100):
         STATS.append({"META": metas[c], "ESCAPED": ESCAPED[c]})
@@ -157,6 +158,8 @@ def Top_Meta():
                 soma += c['ESCAPED']
         media = soma/elemento['OCORRENCIAS']
         elemento['MEDIA'] = media
+
+    metas_ordenados.sort(key=ordena2)
 
     return metas_ordenados  
     
@@ -208,6 +211,6 @@ elif COMANDO == 2:
 
     metas_ordenados = Top_Meta()
     for ranking in metas_ordenados:
-        print(f'{ranking["META"]},  {ranking["MEDIA"]}  \n')
+        print(f'{ranking["META"]}, {ranking["MEDIA"]}  \n')
 
 client.close()
