@@ -150,7 +150,7 @@ def Top_Meta():
     for c in range(0,100):
         STATS.append({"META": metas[c], "ESCAPED": ESCAPED[c]})
 
-    # adicionando a media de cada SAG
+    # adicionando a media de cada meta
     for elemento in metas_ordenados:
         soma = 0
         for c in STATS:
